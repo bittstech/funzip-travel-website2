@@ -325,23 +325,35 @@ export async function createGalleryImageAction(formData: FormData) {
   }
 
   const title = nullableString(formData.get("title"))
-  const altText = nullableString(formData.get("altText")) || title || "Kashmir travel gallery image"
-  const asset = await createMediaAssetFromFile(image, {
-    altText,
-    caption: title,
-    type: MediaAssetType.GALLERY,
-  })
+  const altText =
+    nullableString(formData.get("altText")) ||
+    title ||
+    "Kashmir travel gallery image"
 
-  await getPrisma().galleryImage.create({
-    data: {
-      imageId: asset.id,
-      title,
-      location: nullableString(formData.get("location")),
+  try {
+    const asset = await createMediaAssetFromFile(image, {
       altText,
-      sortOrder: asOptionalInt(formData.get("sortOrder")) || 0,
-      isActive: asBoolean(formData.get("isActive")),
-    },
-  })
+      caption: title,
+      type: MediaAssetType.GALLERY,
+    })
+
+    await getPrisma().galleryImage.create({
+      data: {
+        imageId: asset.id,
+        title,
+        location: nullableString(formData.get("location")),
+        altText,
+        sortOrder: asOptionalInt(formData.get("sortOrder")) || 0,
+        isActive: asBoolean(formData.get("isActive")),
+      },
+    })
+  } catch (error) {
+    adminRedirect(
+      "/admin/gallery",
+      exceptionMessage(error, "Gallery image could not be saved."),
+      "error",
+    )
+  }
 
   revalidatePublic()
   adminRedirect("/admin/gallery", "Gallery image added.")
@@ -353,23 +365,32 @@ export async function updateGalleryImageAction(formData: FormData) {
   const title = nullableString(formData.get("title"))
   const altText = nullableString(formData.get("altText"))
 
-  await getPrisma().galleryImage.update({
-    where: { id },
-    data: {
-      title,
-      location: nullableString(formData.get("location")),
-      altText,
-      sortOrder: asOptionalInt(formData.get("sortOrder")) || 0,
-      isActive: asBoolean(formData.get("isActive")),
-    },
-  })
-
-  if (altText) {
-    const imageId = asString(formData.get("imageId"))
-    await getPrisma().mediaAsset.update({
-      where: { id: imageId },
-      data: { altText, caption: title },
+  try {
+    const db = getPrisma()
+    await db.galleryImage.update({
+      where: { id },
+      data: {
+        title,
+        location: nullableString(formData.get("location")),
+        altText,
+        sortOrder: asOptionalInt(formData.get("sortOrder")) || 0,
+        isActive: asBoolean(formData.get("isActive")),
+      },
     })
+
+    if (altText) {
+      const imageId = asString(formData.get("imageId"))
+      await db.mediaAsset.update({
+        where: { id: imageId },
+        data: { altText, caption: title },
+      })
+    }
+  } catch (error) {
+    adminRedirect(
+      "/admin/gallery",
+      exceptionMessage(error, "Gallery image could not be updated."),
+      "error",
+    )
   }
 
   revalidatePublic()
@@ -379,7 +400,15 @@ export async function updateGalleryImageAction(formData: FormData) {
 export async function deleteGalleryImageAction(formData: FormData) {
   await requireAdmin()
   const id = asString(formData.get("id"))
-  await getPrisma().galleryImage.delete({ where: { id } })
+  try {
+    await getPrisma().galleryImage.delete({ where: { id } })
+  } catch (error) {
+    adminRedirect(
+      "/admin/gallery",
+      exceptionMessage(error, "Gallery image could not be removed."),
+      "error",
+    )
+  }
   revalidatePublic()
   adminRedirect("/admin/gallery", "Gallery image removed.")
 }

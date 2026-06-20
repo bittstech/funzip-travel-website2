@@ -21,7 +21,7 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
 
   return (
     <section id="packages" className="relative overflow-hidden py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal className="max-w-2xl">
             <span className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
@@ -59,7 +59,7 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
 
       <div
         ref={scrollerRef}
-        className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-4 lg:px-8"
+        className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-4 sm:gap-6 sm:px-6 lg:px-8"
       >
         {packages.map((pkg, i) => (
           <motion.article

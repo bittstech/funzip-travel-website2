@@ -26,7 +26,7 @@ export function FinalCta() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/45" />
       </motion.div>
 
-      <div className="mx-auto flex max-w-4xl flex-col items-center px-5 py-28 text-center lg:py-36">
+      <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-24 text-center sm:px-6 lg:px-8 lg:py-36">
         <Reveal>
           <h2 className="font-heading text-4xl font-semibold leading-[1.1] text-balance text-white drop-shadow-lg sm:text-5xl lg:text-6xl">
             Kashmir is calling. Let Funzip plan it perfectly.

@@ -31,7 +31,7 @@ export function Contact({
 
   return (
     <section id="contact" className="relative py-20 lg:py-28">
-      <div className="mx-auto max-w-6xl px-5 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <div className="overflow-hidden rounded-[2rem] border border-border bg-gradient-to-br from-secondary/70 via-card to-background shadow-xl">
             <div className="grid lg:grid-cols-2">

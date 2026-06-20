@@ -1,4 +1,5 @@
 import Image from "next/image"
+import type { Prisma } from "@prisma/client"
 import { AdminNotice } from "@/components/admin/admin-notice"
 import { ImageUploadInput } from "@/components/admin/image-upload-input"
 import {
@@ -11,19 +12,30 @@ import { getPrisma } from "@/lib/cms/prisma"
 const inputClass =
   "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
 const labelClass = "block text-sm font-semibold"
+type GalleryImageWithAsset = Prisma.GalleryImageGetPayload<{
+  include: { image: true }
+}>
 
 export default async function AdminGalleryPage({
   searchParams,
 }: {
   searchParams: Promise<{ success?: string; error?: string }>
 }) {
-  const [params, images] = await Promise.all([
-    searchParams,
-    getPrisma().galleryImage.findMany({
+  const params = await searchParams
+  let databaseError: string | null = null
+  let images: GalleryImageWithAsset[] = []
+
+  try {
+    images = await getPrisma().galleryImage.findMany({
       include: { image: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-    }),
-  ])
+    })
+  } catch (error) {
+    databaseError =
+      error instanceof Error && error.message
+        ? error.message
+        : "The admin database could not be reached."
+  }
 
   return (
     <div>
@@ -35,40 +47,58 @@ export default async function AdminGalleryPage({
         <h1 className="mt-2 font-heading text-4xl font-semibold">Gallery</h1>
       </div>
 
-      <section className="mt-8 rounded-xl border border-border bg-card p-5">
-        <h2 className="font-heading text-2xl font-semibold">Upload Image</h2>
-        <form
-          action={createGalleryImageAction}
-          className="mt-5 grid gap-4 lg:grid-cols-2"
-        >
-          <label className={labelClass}>
-            Title
-            <input name="title" className={`${inputClass} mt-2`} />
-          </label>
-          <label className={labelClass}>
-            Location
-            <input name="location" className={`${inputClass} mt-2`} />
-          </label>
-          <label className={labelClass}>
-            Alt Text
-            <input name="altText" className={`${inputClass} mt-2`} />
-          </label>
-          <label className={labelClass}>
-            Sort Order
-            <input name="sortOrder" type="number" defaultValue={0} className={`${inputClass} mt-2`} />
-          </label>
-          <ImageUploadInput name="image" label="Gallery Image" required />
-          <label className="flex items-end gap-2 pb-2 text-sm font-semibold">
-            <input name="isActive" type="checkbox" defaultChecked />
-            Active
-          </label>
-          <div className="lg:col-span-2">
-            <button className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
-              Add Image
-            </button>
-          </div>
-        </form>
-      </section>
+      {databaseError ? (
+        <div className="mt-8 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <p className="font-semibold">Admin gallery database is not ready.</p>
+          <p className="mt-1">
+            Check the Vercel `DATABASE_URL` environment variable and run Prisma
+            migrations. Gallery uploads will work after the database connects.
+            Details: {databaseError}
+          </p>
+        </div>
+      ) : null}
+
+      {!databaseError ? (
+        <section className="mt-8 rounded-xl border border-border bg-card p-5">
+          <h2 className="font-heading text-2xl font-semibold">Upload Image</h2>
+          <form
+            action={createGalleryImageAction}
+            className="mt-5 grid gap-4 lg:grid-cols-2"
+          >
+            <label className={labelClass}>
+              Title
+              <input name="title" className={`${inputClass} mt-2`} />
+            </label>
+            <label className={labelClass}>
+              Location
+              <input name="location" className={`${inputClass} mt-2`} />
+            </label>
+            <label className={labelClass}>
+              Alt Text
+              <input name="altText" className={`${inputClass} mt-2`} />
+            </label>
+            <label className={labelClass}>
+              Sort Order
+              <input
+                name="sortOrder"
+                type="number"
+                defaultValue={0}
+                className={`${inputClass} mt-2`}
+              />
+            </label>
+            <ImageUploadInput name="image" label="Gallery Image" required />
+            <label className="flex items-end gap-2 pb-2 text-sm font-semibold">
+              <input name="isActive" type="checkbox" defaultChecked />
+              Active
+            </label>
+            <div className="lg:col-span-2">
+              <button className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+                Add Image
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
 
       <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {images.map((item) => (
@@ -141,7 +171,7 @@ export default async function AdminGalleryPage({
           </section>
         ))}
       </div>
-      {images.length === 0 ? (
+      {!databaseError && images.length === 0 ? (
         <div className="mt-8 rounded-xl border border-border bg-card p-8 text-muted-foreground">
           No gallery images yet.
         </div>

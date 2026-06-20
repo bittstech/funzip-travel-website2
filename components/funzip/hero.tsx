@@ -96,7 +96,7 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
 
       <motion.div
         style={{ y: textY, opacity: fade }}
-        className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-5 text-center"
+        className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8"
       >
         {/* <motion.span
           initial={{ opacity: 0, y: 20 }}
@@ -111,7 +111,7 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="font-heading text-5xl font-semibold leading-[1.05] text-balance text-white drop-shadow-lg sm:text-6xl md:text-7xl lg:text-8xl"
+          className="font-heading text-4xl font-semibold leading-[1.05] text-balance text-white drop-shadow-lg sm:text-6xl md:text-7xl lg:text-8xl"
         >
           {slide.title}
         </motion.h1>
