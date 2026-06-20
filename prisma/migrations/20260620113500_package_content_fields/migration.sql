@@ -1,0 +1,4 @@
+ALTER TABLE "Package" ADD COLUMN "itineraryUrl" TEXT;
+ALTER TABLE "Package" ADD COLUMN "services" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Package" ADD COLUMN "highlights" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "Package" ADD COLUMN "mustKnow" JSONB NOT NULL DEFAULT '[]';

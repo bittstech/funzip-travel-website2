@@ -1,0 +1,4 @@
+Funzip Kashmir Tour & Travels
+
+Site: Kashmir tourism, tour packages, blogs, galleries, and lead generation.
+Built with: Next.js App Router, TypeScript, Tailwind CSS, Prisma, and Vercel-ready storage.
