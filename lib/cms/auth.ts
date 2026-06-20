@@ -8,13 +8,14 @@ import {
   ADMIN_COOKIE_NAME,
   ADMIN_SESSION_SECONDS,
   createSessionCookieValue,
+  normalizeAdminSecret,
   verifySessionCookieValue,
 } from "./session"
 
 const loginAttempts = new Map<string, { count: number; resetAt: number }>()
 
 function adminSecret() {
-  return process.env.ADMIN_PASSWORD_HASH
+  return normalizeAdminSecret(process.env.ADMIN_PASSWORD_HASH)
 }
 
 function hashSha256(value: string) {

@@ -8,6 +8,12 @@ type SessionPayload = {
   exp: number
 }
 
+export function normalizeAdminSecret(secret: string | undefined) {
+  const value = secret?.trim()
+  if (!value) return undefined
+  return value.replace(/^['"]|['"]$/g, "").replace(/\\\$/g, "$")
+}
+
 function encode(value: string) {
   return Buffer.from(value).toString("base64url")
 }

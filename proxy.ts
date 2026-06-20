@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import {
   ADMIN_COOKIE_NAME,
+  normalizeAdminSecret,
   verifySessionCookieValue,
 } from "@/lib/cms/session"
 
@@ -9,7 +10,7 @@ export function proxy(request: NextRequest) {
   const isLogin = pathname === "/admin/login"
   const hasSession = verifySessionCookieValue(
     request.cookies.get(ADMIN_COOKIE_NAME)?.value,
-    process.env.ADMIN_PASSWORD_HASH,
+    normalizeAdminSecret(process.env.ADMIN_PASSWORD_HASH),
   )
 
   if (pathname.startsWith("/admin") && !isLogin && !hasSession) {
