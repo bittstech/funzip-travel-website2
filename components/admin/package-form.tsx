@@ -461,7 +461,7 @@ export function PackageForm({
               <input
                 type="checkbox"
                 name="isPublished"
-                defaultChecked={Boolean(pkg?.isPublished)}
+                defaultChecked={pkg ? Boolean(pkg.isPublished) : true}
               />
               Published
             </label>
@@ -469,7 +469,7 @@ export function PackageForm({
               <input
                 type="checkbox"
                 name="isFeatured"
-                defaultChecked={Boolean(pkg?.isFeatured)}
+                defaultChecked={pkg ? Boolean(pkg.isFeatured) : true}
               />
               Featured on homepage
             </label>

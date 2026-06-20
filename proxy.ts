@@ -8,16 +8,17 @@ import {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isLogin = pathname === "/admin/login"
+  const isLoginSubmit = pathname === "/admin/login/submit"
   const hasSession = verifySessionCookieValue(
     request.cookies.get(ADMIN_COOKIE_NAME)?.value,
     normalizeAdminSecret(process.env.ADMIN_PASSWORD) || "imran",
   )
 
-  if (pathname.startsWith("/admin") && !isLogin && !hasSession) {
+  if (pathname.startsWith("/admin") && !isLogin && !isLoginSubmit && !hasSession) {
     return NextResponse.redirect(new URL("/admin/login", request.url))
   }
 
-  if (isLogin && hasSession) {
+  if ((isLogin || isLoginSubmit) && hasSession) {
     return NextResponse.redirect(new URL("/admin", request.url))
   }
 

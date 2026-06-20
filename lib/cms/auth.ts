@@ -1,6 +1,5 @@
 import "server-only"
 
-import { timingSafeEqual } from "crypto"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import {
@@ -16,6 +15,10 @@ const DEFAULT_ADMIN_PASSWORD = "imran"
 
 function adminPassword() {
   return normalizeAdminSecret(process.env.ADMIN_PASSWORD) || DEFAULT_ADMIN_PASSWORD
+}
+
+export function getAdminSessionSecret() {
+  return adminPassword()
 }
 
 export function isLoginRateLimited(key = "global") {
@@ -42,14 +45,11 @@ export function clearLoginFailures(key = "global") {
 }
 
 export async function verifyAdminPassword(password: string) {
-  const expected = Buffer.from(adminPassword())
-  const actual = Buffer.from(password)
-
-  return expected.length === actual.length && timingSafeEqual(expected, actual)
+  return password === adminPassword()
 }
 
 export async function createAdminSession() {
-  const secret = adminPassword()
+  const secret = getAdminSessionSecret()
 
   const store = await cookies()
   store.set(ADMIN_COOKIE_NAME, createSessionCookieValue(secret), {
@@ -70,7 +70,7 @@ export async function verifyAdminSession() {
   const store = await cookies()
   return verifySessionCookieValue(
     store.get(ADMIN_COOKIE_NAME)?.value,
-    adminPassword(),
+    getAdminSessionSecret(),
   )
 }
 

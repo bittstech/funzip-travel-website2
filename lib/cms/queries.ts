@@ -172,21 +172,28 @@ export async function getHeroSlides(): Promise<PublicHeroSlide[]> {
 export async function getFeaturedPackages(limit = 6) {
   return withDatabaseFallback(async (db) => {
     const records = await db.package.findMany({
-      where: { isPublished: true, isFeatured: true },
+      where: { isFeatured: true },
       include: mediaInclude,
-      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ isPublished: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
       take: limit,
     })
 
-    if (records.length === 0) return fallbackPackages.slice(0, limit)
-    return records.map((record) => toPackage(record))
+    if (records.length > 0) return records.map((record) => toPackage(record))
+
+    const latest = await db.package.findMany({
+      include: mediaInclude,
+      orderBy: [{ isPublished: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
+      take: limit,
+    })
+
+    if (latest.length === 0) return fallbackPackages.slice(0, limit)
+    return latest.map((record) => toPackage(record))
   }, fallbackPackages.slice(0, limit))
 }
 
 export async function getPublishedPackages() {
   return withDatabaseFallback(async (db) => {
     const records = await db.package.findMany({
-      where: { isPublished: true },
       include: mediaInclude,
       orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
     })
@@ -201,7 +208,7 @@ export async function getPackageBySlug(slug: string) {
 
   return withDatabaseFallback(async (db) => {
     const record = await db.package.findFirst({
-      where: { slug, isPublished: true },
+      where: { slug },
       include: mediaInclude,
     })
 

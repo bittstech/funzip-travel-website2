@@ -8,14 +8,27 @@ export default async function AdminDashboardPage({
 }: {
   searchParams: Promise<{ success?: string; error?: string }>
 }) {
-  const [params, counts, leads] = await Promise.all([
-    searchParams,
-    getAdminCounts(),
-    getPrisma().lead.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-  ])
+  const params = await searchParams
+  let databaseError: string | null = null
+  let counts = { packages: 0, blogs: 0, leads: 0, media: 0 }
+  let leads: Awaited<ReturnType<ReturnType<typeof getPrisma>["lead"]["findMany"]>> = []
+
+  try {
+    const [adminCounts, recentLeads] = await Promise.all([
+      getAdminCounts(),
+      getPrisma().lead.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+    ])
+    counts = adminCounts
+    leads = recentLeads
+  } catch (error) {
+    databaseError =
+      error instanceof Error && error.message
+        ? error.message
+        : "The admin database could not be reached."
+  }
 
   const statCards = [
     { label: "Packages", value: counts.packages, href: "/admin/packages" },
@@ -27,6 +40,15 @@ export default async function AdminDashboardPage({
   return (
     <div>
       <AdminNotice params={params} />
+      {databaseError ? (
+        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <p className="font-semibold">Admin database is not ready.</p>
+          <p className="mt-1">
+            Check the Vercel `DATABASE_URL` environment variable and run Prisma
+            migrations. Details: {databaseError}
+          </p>
+        </div>
+      ) : null}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
