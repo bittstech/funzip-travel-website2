@@ -98,14 +98,14 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
         style={{ y: textY, opacity: fade }}
         className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-5 text-center"
       >
-        <motion.span
+        {/* <motion.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-white backdrop-blur-md"
         >
           Kashmir Tour Specialists
-        </motion.span>
+        </motion.span> */}
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
