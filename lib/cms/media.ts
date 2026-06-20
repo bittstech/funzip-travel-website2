@@ -1,6 +1,6 @@
 import "server-only"
 
-import { mkdir, writeFile } from "fs/promises"
+import { mkdir, rm, writeFile } from "fs/promises"
 import path from "path"
 import { randomUUID } from "crypto"
 import sharp from "sharp"
@@ -66,6 +66,95 @@ async function storeBuffer(
   await mkdir(path.dirname(path.join(uploadDir, key)), { recursive: true })
   await writeFile(path.join(uploadDir, key), buffer)
   return `/uploads/${key.replace(/\\/g, "/")}`
+}
+
+function collectAssetUrls(asset: {
+  storageUrl: string
+  variantsJson?: unknown
+}) {
+  const urls = new Set<string>([asset.storageUrl])
+
+  if (asset.variantsJson && typeof asset.variantsJson === "object") {
+    for (const variant of Object.values(asset.variantsJson)) {
+      if (variant && typeof variant === "object" && "url" in variant) {
+        const url = (variant as { url?: unknown }).url
+        if (typeof url === "string" && url.length > 0) urls.add(url)
+      }
+    }
+  }
+
+  return [...urls]
+}
+
+async function deleteStoredUrl(url: string) {
+  if (/^https?:\/\//i.test(url)) {
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+    if (!blobToken) return
+
+    const { del } = await import("@vercel/blob")
+    await del(url, { token: blobToken })
+    return
+  }
+
+  if (!url.startsWith("/uploads/")) return
+
+  const uploadRoot = path.resolve(process.cwd(), "public", "uploads")
+  const filePath = path.resolve(
+    process.cwd(),
+    "public",
+    url.replace(/^\//, ""),
+  )
+
+  if (!filePath.startsWith(uploadRoot)) return
+  await rm(filePath, { force: true })
+}
+
+async function deleteMediaAssetFiles(asset: {
+  storageUrl: string
+  variantsJson?: unknown
+}) {
+  for (const url of collectAssetUrls(asset)) {
+    try {
+      await deleteStoredUrl(url)
+    } catch (error) {
+      console.warn("[cms] Could not delete media file:", url, error)
+    }
+  }
+}
+
+export async function deleteUnusedMediaAsset(assetId: string | null | undefined) {
+  if (!assetId) return false
+
+  const db = getPrisma()
+  const asset = await db.mediaAsset.findUnique({
+    where: { id: assetId },
+    include: {
+      _count: {
+        select: {
+          heroSlides: true,
+          mobileHeroSlides: true,
+          galleryImages: true,
+          packageCovers: true,
+          packageOgImages: true,
+          blogCovers: true,
+          blogOgImages: true,
+        },
+      },
+    },
+  })
+
+  if (!asset) return false
+
+  const referenceCount = Object.values(asset._count).reduce(
+    (total, count) => total + count,
+    0,
+  )
+
+  if (referenceCount > 0) return false
+
+  await deleteMediaAssetFiles(asset)
+  await db.mediaAsset.delete({ where: { id: asset.id } })
+  return true
 }
 
 export async function createMediaAssetFromFile(

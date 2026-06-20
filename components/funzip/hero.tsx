@@ -1,8 +1,8 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { motion, useScroll, useTransform } from "motion/react"
+import { AnimatePresence, motion, useScroll, useTransform } from "motion/react"
 import { MapPin, Route, Hotel, MessageCircle } from "lucide-react"
 import type { PublicHeroSlide } from "@/lib/cms/types"
 import { fallbackHeroSlides } from "@/lib/cms/fallback-data"
@@ -16,7 +16,9 @@ const trustItems = [
 
 export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide[] }) {
   const ref = useRef<HTMLDivElement>(null)
-  const slide = slides[0] || fallbackHeroSlides[0]
+  const heroSlides = slides.length > 0 ? slides : fallbackHeroSlides
+  const [activeIndex, setActiveIndex] = useState(0)
+  const slide = heroSlides[activeIndex] || heroSlides[0]
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -27,26 +29,66 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"])
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
+  useEffect(() => {
+    if (activeIndex <= heroSlides.length - 1) return
+    setActiveIndex(0)
+  }, [activeIndex, heroSlides.length])
+
+  useEffect(() => {
+    if (heroSlides.length <= 1) return
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % heroSlides.length)
+    }, 6500)
+
+    return () => window.clearInterval(timer)
+  }, [heroSlides.length])
+
   return (
-    <section ref={ref} id="home" className="relative h-[100svh] min-h-[640px] overflow-hidden">
+    <section
+      ref={ref}
+      id="home"
+      className="relative isolate h-[100svh] min-h-[640px] overflow-hidden bg-black"
+    >
       {/* Parallax background */}
       <motion.div
         style={{ y: bgY, scale: bgScale }}
-        className="absolute inset-0 -z-10"
+        className="absolute inset-0 z-0"
       >
-        <Image
-          src={slide.mobileImage?.url || slide.image.url}
-          alt={slide.mobileImage?.alt || slide.image.alt}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/65" />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={slide.id || slide.image.url}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={slide.image.url}
+              alt={slide.image.alt}
+              fill
+              priority={activeIndex === 0}
+              sizes="100vw"
+              className={`object-cover ${slide.mobileImage ? "hidden sm:block" : ""}`}
+            />
+            {slide.mobileImage ? (
+              <Image
+                src={slide.mobileImage.url}
+                alt={slide.mobileImage.alt}
+                fill
+                priority={activeIndex === 0}
+                sizes="100vw"
+                className="object-cover sm:hidden"
+              />
+            ) : null}
+          </motion.div>
+        </AnimatePresence>
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/55 via-black/45 to-black/80" />
       </motion.div>
 
       {/* Floating clouds */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
         <div className="animate-float-cloud absolute left-[8%] top-[18%] h-24 w-56 rounded-full bg-white/20 blur-3xl" />
         <div className="animate-float-cloud absolute right-[12%] top-[30%] h-20 w-72 rounded-full bg-white/15 blur-3xl [animation-delay:3s]" />
         <div className="animate-float-cloud absolute left-[30%] top-[10%] h-16 w-48 rounded-full bg-white/10 blur-3xl [animation-delay:6s]" />
@@ -122,6 +164,31 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
             </div>
           ))}
         </motion.div>
+
+        {heroSlides.length > 1 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1 }}
+            className="mt-8 flex items-center justify-center gap-2"
+            aria-label="Hero slides"
+          >
+            {heroSlides.map((item, index) => (
+              <button
+                key={item.id || item.image.url}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                aria-label={`Show hero slide ${index + 1}`}
+                aria-current={index === activeIndex}
+                className={`h-2.5 rounded-full transition-all ${
+                  index === activeIndex
+                    ? "w-8 bg-white"
+                    : "w-2.5 bg-white/45 hover:bg-white/75"
+                }`}
+              />
+            ))}
+          </motion.div>
+        ) : null}
       </motion.div>
 
       {/* Scroll cue */}

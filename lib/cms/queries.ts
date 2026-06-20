@@ -115,7 +115,7 @@ export async function getHeroSlides(): Promise<PublicHeroSlide[]> {
     const slides = await db.heroSlide.findMany({
       where: { isActive: true },
       include: { image: true, mobileImage: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     })
 
     if (slides.length === 0) return fallbackHeroSlides
