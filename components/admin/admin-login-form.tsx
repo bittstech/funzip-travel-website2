@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { ADMIN_COOKIE_NAME, ADMIN_SESSION_SECONDS } from "@/lib/cms/session"
 
 const ADMIN_PASSWORD = "imran"
 
@@ -10,16 +9,10 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
   const [error, setError] = useState(initialError || "")
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
     if (password !== ADMIN_PASSWORD) {
+      event.preventDefault()
       setError("Invalid admin password.")
-      return
     }
-
-    const secure = window.location.protocol === "https:" ? "; Secure" : ""
-    document.cookie = `${ADMIN_COOKIE_NAME}=${ADMIN_PASSWORD}; Path=/admin; Max-Age=${ADMIN_SESSION_SECONDS}; SameSite=Lax${secure}`
-    window.location.assign("/admin")
   }
 
   return (
@@ -30,7 +23,12 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
         </div>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+      <form
+        action="/admin/login/submit"
+        method="post"
+        onSubmit={handleSubmit}
+        className="mt-6 flex flex-col gap-4"
+      >
         <label>
           <span className="mb-2 block text-sm font-semibold">Password</span>
           <input

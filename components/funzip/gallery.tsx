@@ -13,7 +13,7 @@ export function Gallery({
 }) {
   return (
     <section id="gallery" className="relative overflow-hidden bg-secondary/40 py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
             Gallery

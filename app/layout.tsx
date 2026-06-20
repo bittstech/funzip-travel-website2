@@ -13,6 +13,18 @@ const cormorant = Cormorant_Garamond({
   weight: ['400', '500', '600', '700'],
 })
 
+const themeScript = `
+(() => {
+  try {
+    const theme = localStorage.getItem("funzip-theme") === "dark" ? "dark" : "light";
+    const root = document.documentElement;
+    root.classList.toggle("dark", theme === "dark");
+    root.classList.toggle("light", theme === "light");
+    root.style.colorScheme = theme;
+  } catch (_) {}
+})();
+`
+
 export const metadata: Metadata = {
   title: 'Funzip | Premium Kashmir Tour & Travel Packages',
   description:
@@ -43,9 +55,11 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} bg-background`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} light bg-background`}
     >
       <body className="font-sans antialiased">
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
