@@ -19,7 +19,9 @@ import type {
 } from "./types"
 import {
   formatPrice,
+  fallbackContentSections,
   imageRef,
+  parseContentSections,
   parseFaqs,
   parseItinerary,
   toStringArray,
@@ -52,6 +54,16 @@ function toPackage(record: any, galleryImages: any[] = []): PublicPackage {
     "/images/dal-lake.png",
   )
 
+  const contentSections = parseContentSections(record.contentSections)
+  const legacySections = fallbackContentSections({
+    services: record.services,
+    highlights: record.highlights,
+    inclusions: record.inclusions,
+    exclusions: record.exclusions,
+    mustKnow: record.mustKnow,
+    itinerary: record.itineraryJson,
+  })
+
   return {
     id: record.id,
     title: record.title,
@@ -69,6 +81,8 @@ function toPackage(record: any, galleryImages: any[] = []): PublicPackage {
       .map((asset) => imageRef(asset, asset.altText || record.title)),
     services: toStringArray(record.services),
     highlights: toStringArray(record.highlights),
+    contentSections:
+      contentSections.length > 0 ? contentSections : legacySections,
     mustKnow: toStringArray(record.mustKnow),
     inclusions: toStringArray(record.inclusions),
     exclusions: toStringArray(record.exclusions),

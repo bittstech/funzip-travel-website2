@@ -5,6 +5,7 @@ import { Navbar } from "@/components/funzip/navbar"
 import { Footer } from "@/components/funzip/footer"
 import { FloatingActions } from "@/components/funzip/floating-actions"
 import { Contact } from "@/components/funzip/contact"
+import { PackageInfoAccordion } from "@/components/funzip/package-info-accordion"
 import {
   getPackageBySlug,
   getPublishedPackages,
@@ -59,6 +60,9 @@ export default async function PackageDetailPage({
   ])
 
   if (!pkg) notFound()
+  const overviewHtml = pkg.fullDescription
+    ? markdownToHtml(pkg.fullDescription)
+    : undefined
 
   return (
     <main>
@@ -127,133 +131,7 @@ export default async function PackageDetailPage({
       <section className="px-5 py-16 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_360px]">
           <div className="space-y-10">
-            {pkg.fullDescription ? (
-              <div>
-                <h2 className="font-heading text-3xl font-semibold">
-                  Overview
-                </h2>
-                <div
-                  className="mt-4 max-w-none leading-relaxed text-muted-foreground [&_a]:font-semibold [&_a]:text-primary [&_a]:underline [&_h1]:mb-3 [&_h1]:mt-6 [&_h1]:font-heading [&_h1]:text-3xl [&_h1]:font-semibold [&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:font-heading [&_h2]:text-2xl [&_h2]:font-semibold [&_h3]:mb-2 [&_h3]:mt-5 [&_h3]:font-heading [&_h3]:text-xl [&_h3]:font-semibold [&_li]:ml-5 [&_ol]:my-4 [&_ol]:list-decimal [&_p]:my-3 [&_strong]:font-semibold [&_ul]:my-4 [&_ul]:list-disc"
-                  dangerouslySetInnerHTML={{ __html: markdownToHtml(pkg.fullDescription) }}
-                />
-              </div>
-            ) : null}
-
-            {pkg.services.length ? (
-              <div>
-                <h2 className="font-heading text-3xl font-semibold">
-                  Services
-                </h2>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {pkg.services.map((service) => (
-                    <div
-                      key={service}
-                      className="rounded-xl border border-border bg-card p-4 text-sm font-semibold"
-                    >
-                      {service}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {pkg.highlights.length ? (
-              <div>
-                <h2 className="font-heading text-3xl font-semibold">
-                  Highlights
-                </h2>
-                <ul className="mt-5 grid gap-3">
-                  {pkg.highlights.map((item, index) => (
-                    <li
-                      key={`${item}-${index}`}
-                      className="rounded-xl border border-border bg-card p-4 text-sm leading-relaxed text-muted-foreground"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-
-            {pkg.itinerary.length || pkg.itineraryUrl ? (
-              <div>
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="font-heading text-3xl font-semibold">
-                    Itinerary
-                  </h2>
-                  {pkg.itineraryUrl ? (
-                    <a
-                      href={pkg.itineraryUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-fit rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-primary hover:text-primary"
-                    >
-                      View PDF Itinerary
-                    </a>
-                  ) : null}
-                </div>
-                {pkg.itinerary.length ? (
-                  <div className="mt-5 space-y-4">
-                    {pkg.itinerary.map((day) => (
-                      <article key={day.day} className="rounded-xl border border-border bg-card p-5">
-                        <p className="text-sm font-semibold text-primary">
-                          Day {day.day}
-                        </p>
-                        <h3 className="mt-1 font-heading text-2xl font-semibold">
-                          {day.title}
-                        </h3>
-                        {day.description ? (
-                          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                            {day.description}
-                          </p>
-                        ) : null}
-                      </article>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-
-            {pkg.mustKnow.length ? (
-              <div>
-                <h2 className="font-heading text-3xl font-semibold">
-                  Know Before Going for {pkg.title}
-                </h2>
-                <div className="mt-5 rounded-xl border border-border bg-card p-5">
-                  <h3 className="font-heading text-2xl font-semibold">
-                    Must Know
-                  </h3>
-                  <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
-                    {pkg.mustKnow.map((item, index) => (
-                      <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-xl border border-border bg-card p-5">
-                <h2 className="font-heading text-2xl font-semibold">
-                  Inclusions
-                </h2>
-                <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                  {pkg.inclusions.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-xl border border-border bg-card p-5">
-                <h2 className="font-heading text-2xl font-semibold">
-                  Exclusions
-                </h2>
-                <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                  {pkg.exclusions.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <PackageInfoAccordion pkg={pkg} overviewHtml={overviewHtml} />
 
             {pkg.galleryImages.length ? (
               <div>
@@ -276,21 +154,6 @@ export default async function PackageDetailPage({
               </div>
             ) : null}
 
-            {pkg.faqs.length ? (
-              <div>
-                <h2 className="font-heading text-3xl font-semibold">FAQs</h2>
-                <div className="mt-5 space-y-4">
-                  {pkg.faqs.map((faq) => (
-                    <article key={faq.question} className="rounded-xl border border-border bg-card p-5">
-                      <h3 className="font-semibold">{faq.question}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                        {faq.answer}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            ) : null}
           </div>
 
           <aside className="h-fit rounded-xl border border-border bg-card p-5 lg:sticky lg:top-24">

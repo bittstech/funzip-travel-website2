@@ -111,6 +111,7 @@ model Package {
   galleryImageIds   Json        @default("[]")
   services          Json        @default("[]")
   highlights        Json        @default("[]")
+  contentSections   Json        @default("[]")
   mustKnow          Json        @default("[]")
   inclusions        Json        @default("[]")
   exclusions        Json        @default("[]")

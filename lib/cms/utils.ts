@@ -1,4 +1,9 @@
-import type { FaqItem, ImageRef, ItineraryDay } from "./types"
+import type {
+  FaqItem,
+  ImageRef,
+  ItineraryDay,
+  PackageContentSection,
+} from "./types"
 
 export const DEFAULT_SITE_URL = "https://funzip.travel"
 
@@ -66,6 +71,82 @@ export function toStringArray(value: unknown): string[] {
 
 export function fieldToStringArray(value: FormDataEntryValue | null | undefined) {
   return toStringArray(asString(value))
+}
+
+export function parseContentSections(value: unknown): PackageContentSection[] {
+  let input = value
+
+  if (typeof value === "string") {
+    const text = value.trim()
+    if (!text) return []
+
+    try {
+      input = JSON.parse(text)
+    } catch {
+      return []
+    }
+  }
+
+  if (!Array.isArray(input)) return []
+
+  const sections: PackageContentSection[] = []
+
+  input.forEach((item, index) => {
+    if (!item || typeof item !== "object") return
+
+    const record = item as Record<string, unknown>
+    const title = String(record.title ?? "").trim()
+    const lines = Array.isArray(record.lines)
+      ? record.lines
+          .map((line) => String(line ?? "").trim())
+          .filter(Boolean)
+      : toStringArray(record.lines)
+
+    if (!title || lines.length === 0) return
+
+    sections.push({
+      id: String(record.id ?? `section-${index + 1}`).trim(),
+      title,
+      lines,
+    })
+  })
+
+  return sections
+}
+
+export function fallbackContentSections(input: {
+  services?: unknown
+  highlights?: unknown
+  inclusions?: unknown
+  exclusions?: unknown
+  mustKnow?: unknown
+  itinerary?: unknown
+}): PackageContentSection[] {
+  const sections: PackageContentSection[] = []
+  const groups = [
+    ["services", "Services", toStringArray(input.services)],
+    ["highlights", "Highlights", toStringArray(input.highlights)],
+    ["inclusions", "Inclusions", toStringArray(input.inclusions)],
+    ["exclusions", "Exclusions", toStringArray(input.exclusions)],
+    ["mustKnow", "Must Know", toStringArray(input.mustKnow)],
+  ] as const
+
+  for (const [id, title, lines] of groups) {
+    if (lines.length) sections.push({ id, title, lines })
+  }
+
+  const itinerary = parseItinerary(input.itinerary)
+  if (itinerary.length) {
+    sections.push({
+      id: "itinerary",
+      title: "Itinerary",
+      lines: itinerary.map((day) =>
+        [day.title, day.description].filter(Boolean).join(" - "),
+      ),
+    })
+  }
+
+  return sections
 }
 
 export function parseFaqs(value: unknown): FaqItem[] {

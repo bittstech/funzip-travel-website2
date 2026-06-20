@@ -75,6 +75,22 @@ export const fallbackPackages: PublicPackage[] = packages.map((pkg, index) => {
       "Balanced sightseeing and leisure time",
       "Customizable plan for families, couples, and groups",
     ],
+    contentSections: [
+      {
+        id: "trip-style",
+        title: "Trip Style",
+        lines: [
+          "Private transfers for the full trip",
+          "Balanced sightseeing and leisure time",
+          "Customizable plan for families, couples, and groups",
+        ],
+      },
+      {
+        id: "included-support",
+        title: "Included Support",
+        lines: ["Private transport", "Hotel stay", "Sightseeing support"],
+      },
+    ],
     mustKnow: [
       "Seasonal activities depend on weather and local conditions.",
       "Advance booking helps secure better hotels and houseboats.",

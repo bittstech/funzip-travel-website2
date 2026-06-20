@@ -17,6 +17,12 @@ export type ItineraryDay = {
   description?: string
 }
 
+export type PackageContentSection = {
+  id?: string
+  title: string
+  lines: string[]
+}
+
 export type SiteSettingsPublic = {
   siteName: string
   siteUrl: string
@@ -58,6 +64,7 @@ export type PublicPackage = {
   galleryImages: ImageRef[]
   services: string[]
   highlights: string[]
+  contentSections: PackageContentSection[]
   mustKnow: string[]
   inclusions: string[]
   exclusions: string[]

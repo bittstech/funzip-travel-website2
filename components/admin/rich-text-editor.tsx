@@ -27,6 +27,7 @@ export function RichTextEditor({
   error?: string
 }) {
   const editorRef = useRef<HTMLDivElement>(null)
+  const hiddenRef = useRef<HTMLTextAreaElement>(null)
   const [html, setHtml] = useState(initialValue || "")
   const errorId = `${name}-error`
 
@@ -34,8 +35,37 @@ export function RichTextEditor({
     document.execCommand("defaultParagraphSeparator", false, "p")
   }, [])
 
+  useEffect(() => {
+    const editor = editorRef.current
+    const form = editor?.closest("form")
+    if (!form) return
+
+    const syncBeforeSubmit = () => {
+      const nextHtml = cleanEmptyHtml(editorRef.current?.innerHTML || "")
+      if (hiddenRef.current) hiddenRef.current.value = nextHtml
+      setHtml(nextHtml)
+    }
+
+    const syncFormData = (event: FormDataEvent) => {
+      const nextHtml = cleanEmptyHtml(editorRef.current?.innerHTML || "")
+      event.formData.set(name, nextHtml)
+      if (hiddenRef.current) hiddenRef.current.value = nextHtml
+      setHtml(nextHtml)
+    }
+
+    form.addEventListener("submit", syncBeforeSubmit, true)
+    form.addEventListener("formdata", syncFormData)
+
+    return () => {
+      form.removeEventListener("submit", syncBeforeSubmit, true)
+      form.removeEventListener("formdata", syncFormData)
+    }
+  }, [name])
+
   function syncValue() {
-    setHtml(cleanEmptyHtml(editorRef.current?.innerHTML || ""))
+    const nextHtml = cleanEmptyHtml(editorRef.current?.innerHTML || "")
+    if (hiddenRef.current) hiddenRef.current.value = nextHtml
+    setHtml(nextHtml)
   }
 
   function runCommand(command: string, value?: string) {
@@ -130,7 +160,7 @@ export function RichTextEditor({
           dangerouslySetInnerHTML={{ __html: initialValue || "" }}
         />
       </div>
-      <textarea name={name} value={html} readOnly hidden />
+      <textarea ref={hiddenRef} name={name} value={html} readOnly hidden />
       {error ? (
         <p id={errorId} className="mt-1 text-xs font-semibold text-destructive">
           {error}

@@ -1,10 +1,16 @@
 "use client"
 
-import { useActionState } from "react"
+import { type FormEvent, useActionState, useState } from "react"
 import { ImageUploadInput } from "./image-upload-input"
+import { PackageSectionsInput } from "./package-sections-input"
 import { RichTextEditor } from "./rich-text-editor"
 import type { AdminFormState } from "@/app/admin/actions"
-import { toStringArray } from "@/lib/cms/utils"
+import {
+  parseContentSections,
+  parseItinerary,
+  slugify,
+  toStringArray,
+} from "@/lib/cms/utils"
 
 const inputClass =
   "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -48,6 +54,101 @@ function fieldA11y(name: string, error?: string) {
   }
 }
 
+function textValue(formData: FormData, name: string) {
+  return String(formData.get(name) || "").trim()
+}
+
+function validateAbsoluteUrl(
+  errors: Record<string, string>,
+  formData: FormData,
+  name: string,
+  label: string,
+) {
+  const value = textValue(formData, name)
+  if (!value) return
+
+  try {
+    const url = new URL(value)
+    if (!["http:", "https:"].includes(url.protocol)) {
+      errors[name] = `${label} must start with http or https.`
+    }
+  } catch {
+    errors[name] = `${label} must be a valid URL.`
+  }
+}
+
+function validatePackageForm(formData: FormData) {
+  const errors: Record<string, string> = {}
+  const title = textValue(formData, "title")
+  const slug = slugify(textValue(formData, "slug") || title)
+  const shortDescription = textValue(formData, "shortDescription")
+  const price = textValue(formData, "priceStartingFrom")
+  const metaTitle = textValue(formData, "metaTitle")
+  const metaDescription = textValue(formData, "metaDescription")
+
+  if (title.length < 3) errors.title = "Title must be at least 3 characters."
+  if (slug.length < 3) errors.slug = "Slug needs at least 3 URL-safe characters."
+  if (shortDescription.length < 10) {
+    errors.shortDescription = "Short description must be at least 10 characters."
+  }
+  if (price && (!Number.isFinite(Number(price)) || Number(price) <= 0)) {
+    errors.priceStartingFrom = "Starting price must be a positive number."
+  }
+  if (metaTitle.length > 80) {
+    errors.metaTitle = "Meta title must be 80 characters or less."
+  }
+  if (metaDescription.length > 180) {
+    errors.metaDescription = "Meta description must be 180 characters or less."
+  }
+
+  validateAbsoluteUrl(errors, formData, "itineraryUrl", "Itinerary PDF URL")
+  validateAbsoluteUrl(errors, formData, "canonicalUrl", "Canonical URL")
+
+  return errors
+}
+
+function packageSectionsFromPackage(pkg: any) {
+  const savedSections = parseContentSections(pkg?.contentSections)
+  if (savedSections.length > 0) return savedSections
+
+  const fallbackSections = [
+    {
+      id: "services",
+      title: "Services",
+      lines: toStringArray(pkg?.services),
+    },
+    {
+      id: "highlights",
+      title: "Highlights",
+      lines: toStringArray(pkg?.highlights),
+    },
+    {
+      id: "inclusions",
+      title: "Inclusions",
+      lines: toStringArray(pkg?.inclusions),
+    },
+    {
+      id: "exclusions",
+      title: "Exclusions",
+      lines: toStringArray(pkg?.exclusions),
+    },
+    {
+      id: "must-know",
+      title: "Must Know",
+      lines: toStringArray(pkg?.mustKnow),
+    },
+    {
+      id: "itinerary",
+      title: "Itinerary",
+      lines: parseItinerary(pkg?.itineraryJson).map((day) =>
+        [day.title, day.description].filter(Boolean).join(" - "),
+      ),
+    },
+  ]
+
+  return fallbackSections.filter((section) => section.lines.length > 0)
+}
+
 export function PackageForm({
   action,
   submitLabel,
@@ -60,29 +161,54 @@ export function PackageForm({
   pkg?: any
 }) {
   const [state, formAction, isPending] = useActionState(action, initialFormState)
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({})
+  const [clientMessage, setClientMessage] = useState("")
   const selectedGallery = new Set(toStringArray(pkg?.galleryImageIds))
+  const displayState = {
+    ...state,
+    fieldErrors: { ...(state.fieldErrors || {}), ...clientErrors },
+  }
+  const noticeMessage = clientMessage || state.message
 
-  const titleError = fieldError(state, "title")
-  const slugError = fieldError(state, "slug")
-  const shortDescriptionError = fieldError(state, "shortDescription")
-  const fullDescriptionError = fieldError(state, "fullDescription")
-  const itineraryUrlError = fieldError(state, "itineraryUrl")
-  const priceError = fieldError(state, "priceStartingFrom")
-  const metaTitleError = fieldError(state, "metaTitle")
-  const metaDescriptionError = fieldError(state, "metaDescription")
-  const canonicalUrlError = fieldError(state, "canonicalUrl")
+  const titleError = fieldError(displayState, "title")
+  const slugError = fieldError(displayState, "slug")
+  const shortDescriptionError = fieldError(displayState, "shortDescription")
+  const fullDescriptionError = fieldError(displayState, "fullDescription")
+  const itineraryUrlError = fieldError(displayState, "itineraryUrl")
+  const priceError = fieldError(displayState, "priceStartingFrom")
+  const metaTitleError = fieldError(displayState, "metaTitle")
+  const metaDescriptionError = fieldError(displayState, "metaDescription")
+  const canonicalUrlError = fieldError(displayState, "canonicalUrl")
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    const errors = validatePackageForm(new FormData(event.currentTarget))
+    if (Object.keys(errors).length === 0) {
+      setClientErrors({})
+      setClientMessage("")
+      return
+    }
+
+    event.preventDefault()
+    setClientErrors(errors)
+    setClientMessage("Please fix the highlighted fields before saving.")
+  }
 
   return (
-    <form action={formAction} noValidate className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <form
+      action={formAction}
+      onSubmit={handleSubmit}
+      noValidate
+      className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]"
+    >
       {pkg?.id ? <input type="hidden" name="id" value={pkg.id} /> : null}
 
       <div className="min-w-0 space-y-5">
-        {state.message ? (
+        {noticeMessage ? (
           <div
             role="alert"
             className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
           >
-            {state.message}
+            {noticeMessage}
           </div>
         ) : null}
 
@@ -174,7 +300,21 @@ export function PackageForm({
         </section>
 
         <section className="rounded-xl border border-border bg-card p-5">
-          <h2 className="font-heading text-2xl font-semibold">Trip Content</h2>
+          <PackageSectionsInput
+            name="contentSections"
+            initialSections={packageSectionsFromPackage(pkg)}
+          />
+        </section>
+
+        <section className="rounded-xl border border-border bg-card p-5">
+          <details>
+            <summary className="cursor-pointer font-heading text-2xl font-semibold">
+              Optional Structured Extras
+            </summary>
+            <p className="mt-2 text-sm text-muted-foreground">
+              These fields are optional. Use them when you want separate SEO or
+              itinerary data in addition to the display sections above.
+            </p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className={labelClass}>
               Services
@@ -260,6 +400,7 @@ export function PackageForm({
               />
             </label>
           </div>
+          </details>
         </section>
 
         <section className="rounded-xl border border-border bg-card p-5">
