@@ -6,7 +6,6 @@ import {
   ADMIN_COOKIE_NAME,
   ADMIN_SESSION_SECONDS,
   createSessionCookieValue,
-  normalizeAdminSecret,
   verifySessionCookieValue,
 } from "./session"
 
@@ -14,7 +13,7 @@ const loginAttempts = new Map<string, { count: number; resetAt: number }>()
 const DEFAULT_ADMIN_PASSWORD = "imran"
 
 function adminPassword() {
-  return normalizeAdminSecret(process.env.ADMIN_PASSWORD) || DEFAULT_ADMIN_PASSWORD
+  return DEFAULT_ADMIN_PASSWORD
 }
 
 export function getAdminSessionSecret() {

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import {
   ADMIN_COOKIE_NAME,
-  normalizeAdminSecret,
   verifySessionCookieValue,
 } from "@/lib/cms/session"
+
+const ADMIN_PASSWORD = "imran"
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -11,7 +12,7 @@ export function proxy(request: NextRequest) {
   const isLoginSubmit = pathname === "/admin/login/submit"
   const hasSession = verifySessionCookieValue(
     request.cookies.get(ADMIN_COOKIE_NAME)?.value,
-    normalizeAdminSecret(process.env.ADMIN_PASSWORD) || "imran",
+    ADMIN_PASSWORD,
   )
 
   if (pathname.startsWith("/admin") && !isLogin && !isLoginSubmit && !hasSession) {
