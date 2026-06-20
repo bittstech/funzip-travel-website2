@@ -2,6 +2,7 @@ import Link from "next/link"
 import { AdminNotice } from "@/components/admin/admin-notice"
 import {
   deletePackageAction,
+  duplicatePackageAction,
   togglePackagePublishAction,
 } from "@/app/admin/actions"
 import { getPrisma } from "@/lib/cms/prisma"
@@ -92,6 +93,12 @@ export default async function AdminPackagesPage({
                       >
                         Edit
                       </Link>
+                      <form action={duplicatePackageAction}>
+                        <input type="hidden" name="id" value={pkg.id} />
+                        <button className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold">
+                          Copy
+                        </button>
+                      </form>
                       <form action={togglePackagePublishAction}>
                         <input type="hidden" name="id" value={pkg.id} />
                         <button className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold">

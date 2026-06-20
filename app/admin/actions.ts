@@ -1,6 +1,6 @@
 "use server"
 
-import { MediaAssetType } from "@prisma/client"
+import { MediaAssetType, Prisma } from "@prisma/client"
 import { ZodError } from "zod"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
@@ -433,6 +433,22 @@ function readPackageForm(formData: FormData) {
   }
 }
 
+async function uniquePackageSlug(
+  db: ReturnType<typeof getPrisma>,
+  baseSlug: string,
+) {
+  const cleanBase = slugify(baseSlug) || "package-copy"
+  let candidate = cleanBase
+  let suffix = 2
+
+  while (await db.package.findUnique({ where: { slug: candidate } })) {
+    candidate = `${cleanBase}-${suffix}`
+    suffix += 1
+  }
+
+  return candidate
+}
+
 export async function createPackageAction(
   _previousState: AdminFormState,
   formData: FormData,
@@ -560,6 +576,51 @@ export async function togglePackagePublishAction(formData: FormData) {
   revalidatePublic()
   revalidatePath(`/packages/${pkg.slug}`)
   adminRedirect("/admin/packages", pkg.isPublished ? "Package unpublished." : "Package published.")
+}
+
+export async function duplicatePackageAction(formData: FormData) {
+  await requireAdmin()
+  const db = getPrisma()
+  const id = asString(formData.get("id"))
+  const pkg = await db.package.findUnique({ where: { id } })
+
+  if (!pkg) adminRedirect("/admin/packages", "Package not found.", "error")
+
+  const copyTitle = `${pkg.title} Copy`
+  const copySlug = await uniquePackageSlug(db, `${pkg.slug}-copy`)
+
+  const copied = await db.package.create({
+    data: {
+      title: copyTitle,
+      slug: copySlug,
+      shortDescription: pkg.shortDescription,
+      fullDescription: pkg.fullDescription,
+      itineraryUrl: pkg.itineraryUrl,
+      location: pkg.location,
+      duration: pkg.duration,
+      priceStartingFrom: pkg.priceStartingFrom,
+      coverImageId: pkg.coverImageId,
+      galleryImageIds: (pkg.galleryImageIds || []) as Prisma.InputJsonValue,
+      services: (pkg.services || []) as Prisma.InputJsonValue,
+      highlights: (pkg.highlights || []) as Prisma.InputJsonValue,
+      mustKnow: (pkg.mustKnow || []) as Prisma.InputJsonValue,
+      inclusions: (pkg.inclusions || []) as Prisma.InputJsonValue,
+      exclusions: (pkg.exclusions || []) as Prisma.InputJsonValue,
+      itineraryJson: (pkg.itineraryJson || []) as Prisma.InputJsonValue,
+      faqsJson: (pkg.faqsJson || []) as Prisma.InputJsonValue,
+      metaTitle: pkg.metaTitle ? `${pkg.metaTitle} Copy` : null,
+      metaDescription: pkg.metaDescription,
+      ogImageId: pkg.ogImageId,
+      canonicalUrl: null,
+      keywords: (pkg.keywords || []) as Prisma.InputJsonValue,
+      isFeatured: false,
+      isPublished: false,
+      publishedAt: null,
+    },
+  })
+
+  revalidatePath("/admin/packages")
+  adminRedirect(`/admin/packages/${copied.id}`, "Package copied as a draft.")
 }
 
 export async function deletePackageAction(formData: FormData) {

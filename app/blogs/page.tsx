@@ -31,6 +31,10 @@ export default async function BlogsPage() {
     getPublishedBlogs(),
     getPublishedPackages(),
   ])
+  const heroImage = blogs[0]?.coverImage || {
+    url: settings.defaultOgImage || "/images/gardens.png",
+    alt: "Kashmir travel blog",
+  }
 
   return (
     <main>
@@ -44,15 +48,24 @@ export default async function BlogsPage() {
         ]}
       />
       <Navbar />
-      <section className="bg-secondary/40 px-5 pb-16 pt-32 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+      <section className="relative isolate min-h-[52svh] overflow-hidden bg-black px-5 pb-16 pt-36 text-white lg:px-8">
+        <Image
+          src={heroImage.url}
+          alt={heroImage.alt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/65 via-black/45 to-black/80" />
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
             Travel Journal
           </p>
           <h1 className="mt-3 font-heading text-5xl font-semibold">
             Kashmir Travel Blog
           </h1>
-          <p className="mt-4 max-w-2xl text-muted-foreground">
+          <p className="mt-4 max-w-2xl text-white/85">
             Practical guides and inspiration for planning a beautiful Kashmir
             holiday.
           </p>

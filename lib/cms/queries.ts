@@ -1,5 +1,7 @@
 import "server-only"
 
+import { existsSync } from "fs"
+import path from "path"
 import {
   fallbackBlogs,
   fallbackGalleryImages,
@@ -28,9 +30,24 @@ const mediaInclude = {
   ogImage: true,
 } as const
 
+function localUploadExists(url: string | null | undefined) {
+  if (!url || !url.startsWith("/uploads/")) return true
+
+  const uploadRoot = path.resolve(process.cwd(), "public", "uploads")
+  const filePath = path.resolve(process.cwd(), "public", url.replace(/^\//, ""))
+
+  return filePath.startsWith(uploadRoot) && existsSync(filePath)
+}
+
+function renderableAsset<T extends { storageUrl?: string | null }>(
+  asset: T | null | undefined,
+) {
+  return localUploadExists(asset?.storageUrl) ? asset : null
+}
+
 function toPackage(record: any, galleryImages: any[] = []): PublicPackage {
   const cover = imageRef(
-    record.coverImage,
+    renderableAsset(record.coverImage),
     `${record.title} Kashmir package`,
     "/images/dal-lake.png",
   )
@@ -47,9 +64,9 @@ function toPackage(record: any, galleryImages: any[] = []): PublicPackage {
     priceStartingFrom: record.priceStartingFrom,
     priceLabel: formatPrice(record.priceStartingFrom),
     coverImage: cover,
-    galleryImages: galleryImages.map((asset) =>
-      imageRef(asset, asset.altText || record.title),
-    ),
+    galleryImages: galleryImages
+      .filter((asset) => localUploadExists(asset.storageUrl))
+      .map((asset) => imageRef(asset, asset.altText || record.title)),
     services: toStringArray(record.services),
     highlights: toStringArray(record.highlights),
     mustKnow: toStringArray(record.mustKnow),
@@ -59,8 +76,8 @@ function toPackage(record: any, galleryImages: any[] = []): PublicPackage {
     faqs: parseFaqs(record.faqsJson),
     metaTitle: record.metaTitle,
     metaDescription: record.metaDescription,
-    ogImage: record.ogImage
-      ? imageRef(record.ogImage, `${record.title} social preview`)
+    ogImage: renderableAsset(record.ogImage)
+      ? imageRef(renderableAsset(record.ogImage), `${record.title} social preview`)
       : cover,
     canonicalUrl: record.canonicalUrl,
     keywords: toStringArray(record.keywords),
@@ -72,7 +89,7 @@ function toPackage(record: any, galleryImages: any[] = []): PublicPackage {
 
 function toBlog(record: any): PublicBlog {
   const cover = imageRef(
-    record.coverImage,
+    renderableAsset(record.coverImage),
     record.title,
     "/images/gardens.png",
   )
@@ -90,8 +107,8 @@ function toBlog(record: any): PublicBlog {
     faqs: parseFaqs(record.faqsJson),
     metaTitle: record.metaTitle,
     metaDescription: record.metaDescription,
-    ogImage: record.ogImage
-      ? imageRef(record.ogImage, `${record.title} social preview`)
+    ogImage: renderableAsset(record.ogImage)
+      ? imageRef(renderableAsset(record.ogImage), `${record.title} social preview`)
       : cover,
     canonicalUrl: record.canonicalUrl,
     isPublished: record.isPublished,
@@ -118,14 +135,18 @@ export async function getHeroSlides(): Promise<PublicHeroSlide[]> {
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     })
 
-    if (slides.length === 0) return fallbackHeroSlides
+    const renderableSlides = slides.filter((slide) =>
+      localUploadExists(slide.image.storageUrl),
+    )
 
-    return slides.map((slide) => ({
+    if (renderableSlides.length === 0) return fallbackHeroSlides
+
+    return renderableSlides.map((slide) => ({
       id: slide.id,
       title: slide.title,
       subtitle: slide.subtitle,
       image: imageRef(slide.image, slide.title, "/images/hero-kashmir.png"),
-      mobileImage: slide.mobileImage
+      mobileImage: slide.mobileImage && localUploadExists(slide.mobileImage.storageUrl)
         ? imageRef(slide.mobileImage, slide.title, "/images/hero-kashmir.png")
         : null,
       ctaText: slide.ctaText,

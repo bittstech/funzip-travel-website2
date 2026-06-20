@@ -76,17 +76,17 @@ export default async function BlogDetailPage({
       />
       <Navbar />
       <article>
-        <header className="relative min-h-[65svh] overflow-hidden px-5 pb-16 pt-36 text-white lg:px-8">
+        <header className="relative isolate min-h-[65svh] overflow-hidden bg-black px-5 pb-16 pt-36 text-white lg:px-8">
           <Image
             src={blog.coverImage.url}
             alt={blog.coverImage.alt}
             fill
             priority
             sizes="100vw"
-            className="-z-10 object-cover"
+            className="object-cover"
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/35 to-black/75" />
-          <div className="mx-auto max-w-4xl">
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+          <div className="relative z-10 mx-auto max-w-4xl">
             <Link href="/blogs" className="text-sm font-semibold text-white/85">
               Travel Journal
             </Link>

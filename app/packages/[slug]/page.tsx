@@ -74,17 +74,17 @@ export default async function PackageDetailPage({
         ].filter(Boolean) as any}
       />
       <Navbar />
-      <section className="relative min-h-[70svh] overflow-hidden px-5 pb-16 pt-36 text-white lg:px-8">
+      <section className="relative isolate min-h-[70svh] overflow-hidden bg-black px-5 pb-16 pt-36 text-white lg:px-8">
         <Image
           src={pkg.coverImage.url}
           alt={pkg.coverImage.alt}
           fill
           priority
           sizes="100vw"
-          className="-z-10 object-cover"
+          className="object-cover"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/35 to-black/75" />
-        <div className="mx-auto max-w-5xl">
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+        <div className="relative z-10 mx-auto max-w-5xl">
           <Link href="/packages" className="text-sm font-semibold text-white/85">
             Packages
           </Link>
