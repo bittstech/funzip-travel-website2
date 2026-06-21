@@ -45,6 +45,12 @@ function validateFile(file: File) {
   }
 }
 
+function toPlainArrayBuffer(buffer: Buffer) {
+  const arrayBuffer = new ArrayBuffer(buffer.byteLength)
+  new Uint8Array(arrayBuffer).set(buffer)
+  return arrayBuffer
+}
+
 async function storeBuffer(
   key: string,
   buffer: Buffer,
@@ -54,12 +60,21 @@ async function storeBuffer(
 
   if (blobToken) {
     const { put } = await import("@vercel/blob")
-    const blob = await put(key, buffer, {
+    const uploadBody = new Blob([toPlainArrayBuffer(buffer)], {
+      type: contentType,
+    })
+    const blob = await put(key, uploadBody, {
       access: "public",
       contentType,
       token: blobToken,
     })
     return blob.url
+  }
+
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not configured for this deployment. Add it in Vercel Environment Variables and redeploy.",
+    )
   }
 
   const uploadDir = path.join(process.cwd(), "public", "uploads")

@@ -88,6 +88,18 @@ function exceptionMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback
 }
 
+async function cleanupMediaAssets(assetIds: Array<string | null | undefined>) {
+  await Promise.all(
+    assetIds.filter(Boolean).map(async (assetId) => {
+      try {
+        await deleteUnusedMediaAsset(assetId)
+      } catch (error) {
+        console.warn("[admin] Could not clean up media asset:", assetId, error)
+      }
+    }),
+  )
+}
+
 async function imageIdFromForm(
   formData: FormData,
   uploadField: string,
@@ -182,7 +194,6 @@ export async function saveSiteSettingsAction(formData: FormData) {
 
 export async function createHeroSlideAction(formData: FormData) {
   await requireAdmin()
-  const db = getPrisma()
   const title = asString(formData.get("title"))
   const image = formData.get("image")
 
@@ -190,30 +201,45 @@ export async function createHeroSlideAction(formData: FormData) {
     adminRedirect("/admin/hero", "Title and desktop hero image are required.", "error")
   }
 
-  const desktop = await createMediaAssetFromFile(image, {
-    altText: title,
-    type: MediaAssetType.HERO,
-  })
-  const mobileUpload = formData.get("mobileImage")
-  const mobile = hasUploadedFile(mobileUpload)
-    ? await createMediaAssetFromFile(mobileUpload, {
-        altText: `${title} mobile hero image`,
-        type: MediaAssetType.HERO,
-      })
-    : null
+  const createdAssetIds: string[] = []
 
-  await db.heroSlide.create({
-    data: {
-      title,
-      subtitle: nullableString(formData.get("subtitle")),
-      imageId: desktop.id,
-      mobileImageId: mobile?.id,
-      ctaText: nullableString(formData.get("ctaText")),
-      ctaUrl: nullableString(formData.get("ctaUrl")),
-      sortOrder: asOptionalInt(formData.get("sortOrder")) || 0,
-      isActive: asBoolean(formData.get("isActive")),
-    },
-  })
+  try {
+    const db = getPrisma()
+    const desktop = await createMediaAssetFromFile(image, {
+      altText: title,
+      type: MediaAssetType.HERO,
+    })
+    createdAssetIds.push(desktop.id)
+
+    const mobileUpload = formData.get("mobileImage")
+    const mobile = hasUploadedFile(mobileUpload)
+      ? await createMediaAssetFromFile(mobileUpload, {
+          altText: `${title} mobile hero image`,
+          type: MediaAssetType.HERO,
+        })
+      : null
+    if (mobile) createdAssetIds.push(mobile.id)
+
+    await db.heroSlide.create({
+      data: {
+        title,
+        subtitle: nullableString(formData.get("subtitle")),
+        imageId: desktop.id,
+        mobileImageId: mobile?.id,
+        ctaText: nullableString(formData.get("ctaText")),
+        ctaUrl: nullableString(formData.get("ctaUrl")),
+        sortOrder: asOptionalInt(formData.get("sortOrder")) || 0,
+        isActive: asBoolean(formData.get("isActive")),
+      },
+    })
+  } catch (error) {
+    await cleanupMediaAssets(createdAssetIds)
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Hero slide could not be saved."),
+      "error",
+    )
+  }
 
   revalidatePublic()
   adminRedirect("/admin/hero", "Hero image uploaded and slide added.")
@@ -221,15 +247,31 @@ export async function createHeroSlideAction(formData: FormData) {
 
 export async function updateHeroSlideAction(formData: FormData) {
   await requireAdmin()
-  const db = getPrisma()
   const id = asString(formData.get("id"))
   const title = asString(formData.get("title"))
   if (!id || !title) adminRedirect("/admin/hero", "Missing hero slide details.", "error")
 
-  const existing = await db.heroSlide.findUnique({
-    where: { id },
-    select: { imageId: true, mobileImageId: true },
-  })
+  let lookup!: {
+    db: ReturnType<typeof getPrisma>
+    existing: { imageId: string; mobileImageId: string | null } | null
+  }
+
+  try {
+    const db = getPrisma()
+    const existing = await db.heroSlide.findUnique({
+      where: { id },
+      select: { imageId: true, mobileImageId: true },
+    })
+    lookup = { db, existing }
+  } catch (error) {
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Hero slide could not be loaded."),
+      "error",
+    )
+  }
+
+  const { db, existing } = lookup
   if (!existing) adminRedirect("/admin/hero", "Hero slide not found.", "error")
 
   const data: any = {
@@ -242,28 +284,42 @@ export async function updateHeroSlideAction(formData: FormData) {
   }
 
   const replacedAssetIds: string[] = []
+  const createdAssetIds: string[] = []
   const image = formData.get("image")
-  if (hasUploadedFile(image)) {
-    const asset = await createMediaAssetFromFile(image, {
-      altText: title,
-      type: MediaAssetType.HERO,
-    })
-    data.imageId = asset.id
-    replacedAssetIds.push(existing.imageId)
+
+  try {
+    if (hasUploadedFile(image)) {
+      const asset = await createMediaAssetFromFile(image, {
+        altText: title,
+        type: MediaAssetType.HERO,
+      })
+      data.imageId = asset.id
+      createdAssetIds.push(asset.id)
+      replacedAssetIds.push(existing.imageId)
+    }
+
+    const mobileImage = formData.get("mobileImage")
+    if (hasUploadedFile(mobileImage)) {
+      const asset = await createMediaAssetFromFile(mobileImage, {
+        altText: `${title} mobile hero image`,
+        type: MediaAssetType.HERO,
+      })
+      data.mobileImageId = asset.id
+      createdAssetIds.push(asset.id)
+      if (existing.mobileImageId) replacedAssetIds.push(existing.mobileImageId)
+    }
+
+    await db.heroSlide.update({ where: { id }, data })
+    await cleanupMediaAssets(replacedAssetIds)
+  } catch (error) {
+    await cleanupMediaAssets(createdAssetIds)
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Hero slide could not be updated."),
+      "error",
+    )
   }
 
-  const mobileImage = formData.get("mobileImage")
-  if (hasUploadedFile(mobileImage)) {
-    const asset = await createMediaAssetFromFile(mobileImage, {
-      altText: `${title} mobile hero image`,
-      type: MediaAssetType.HERO,
-    })
-    data.mobileImageId = asset.id
-    if (existing.mobileImageId) replacedAssetIds.push(existing.mobileImageId)
-  }
-
-  await db.heroSlide.update({ where: { id }, data })
-  await Promise.all(replacedAssetIds.map((assetId) => deleteUnusedMediaAsset(assetId)))
   revalidatePublic()
   adminRedirect(
     "/admin/hero",
@@ -275,44 +331,89 @@ export async function updateHeroSlideAction(formData: FormData) {
 
 export async function deleteHeroMobileImageAction(formData: FormData) {
   await requireAdmin()
-  const db = getPrisma()
   const id = asString(formData.get("id"))
-  const slide = await db.heroSlide.findUnique({
-    where: { id },
-    select: { mobileImageId: true },
-  })
+  let lookup!: {
+    db: ReturnType<typeof getPrisma>
+    slide: { mobileImageId: string | null } | null
+  }
 
+  try {
+    const db = getPrisma()
+    const slide = await db.heroSlide.findUnique({
+      where: { id },
+      select: { mobileImageId: true },
+    })
+    lookup = { db, slide }
+  } catch (error) {
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Hero slide could not be loaded."),
+      "error",
+    )
+  }
+
+  const { db, slide } = lookup
   if (!slide) adminRedirect("/admin/hero", "Hero slide not found.", "error")
   if (!slide.mobileImageId) {
     adminRedirect("/admin/hero", "This slide has no mobile image.", "error")
   }
 
   const mobileImageId = slide.mobileImageId
-  await db.heroSlide.update({
-    where: { id },
-    data: { mobileImageId: null },
-  })
-  await deleteUnusedMediaAsset(mobileImageId)
+  try {
+    await db.heroSlide.update({
+      where: { id },
+      data: { mobileImageId: null },
+    })
+    await cleanupMediaAssets([mobileImageId])
+  } catch (error) {
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Mobile hero image could not be deleted."),
+      "error",
+    )
+  }
+
   revalidatePublic()
   adminRedirect("/admin/hero", "Mobile hero image deleted.")
 }
 
 export async function deleteHeroSlideAction(formData: FormData) {
   await requireAdmin()
-  const db = getPrisma()
   const id = asString(formData.get("id"))
-  const slide = await db.heroSlide.findUnique({
-    where: { id },
-    select: { imageId: true, mobileImageId: true },
-  })
+  let lookup!: {
+    db: ReturnType<typeof getPrisma>
+    slide: { imageId: string; mobileImageId: string | null } | null
+  }
 
+  try {
+    const db = getPrisma()
+    const slide = await db.heroSlide.findUnique({
+      where: { id },
+      select: { imageId: true, mobileImageId: true },
+    })
+    lookup = { db, slide }
+  } catch (error) {
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Hero slide could not be loaded."),
+      "error",
+    )
+  }
+
+  const { db, slide } = lookup
   if (!slide) adminRedirect("/admin/hero", "Hero slide not found.", "error")
 
-  await db.heroSlide.delete({ where: { id } })
-  await Promise.all([
-    deleteUnusedMediaAsset(slide.imageId),
-    deleteUnusedMediaAsset(slide.mobileImageId),
-  ])
+  try {
+    await db.heroSlide.delete({ where: { id } })
+    await cleanupMediaAssets([slide.imageId, slide.mobileImageId])
+  } catch (error) {
+    adminRedirect(
+      "/admin/hero",
+      exceptionMessage(error, "Hero slide could not be deleted."),
+      "error",
+    )
+  }
+
   revalidatePublic()
   adminRedirect("/admin/hero", "Hero slide and uploaded images deleted.")
 }
