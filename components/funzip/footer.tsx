@@ -54,9 +54,9 @@ export function Footer({
               journeys through the valley&apos;s most beautiful corners.
             </p>
             <div className="mt-5 flex gap-3">
-              {socials.map((s) => (
+              {socials.map((s, socialIndex) => (
                 <a
-                  key={s.label}
+                  key={`${s.label}-${socialIndex}`}
                   href="#"
                   aria-label={s.label}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-background/10 text-background transition-colors hover:bg-primary hover:text-primary-foreground"
@@ -70,8 +70,8 @@ export function Footer({
           <div>
             <h3 className="font-heading text-lg font-semibold">Quick Links</h3>
             <ul className="mt-4 flex flex-col gap-2.5">
-              {quickLinks.map((link) => (
-                <li key={link.label}>
+              {quickLinks.map((link, linkIndex) => (
+                <li key={`${link.href}-${linkIndex}`}>
                   <a
                     href={link.href}
                     className="text-sm text-background/70 transition-colors hover:text-primary"
@@ -86,8 +86,8 @@ export function Footer({
           <div>
             <h3 className="font-heading text-lg font-semibold">Packages</h3>
             <ul className="mt-4 flex flex-col gap-2.5">
-              {packages.slice(0, 6).map((pkg) => (
-                <li key={pkg.slug}>
+              {packages.slice(0, 6).map((pkg, packageIndex) => (
+                <li key={`${pkg.id || pkg.slug}-${packageIndex}`}>
                   <a
                     href={`/packages/${pkg.slug}`}
                     className="text-sm text-background/70 transition-colors hover:text-primary"

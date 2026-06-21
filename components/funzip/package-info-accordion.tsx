@@ -34,10 +34,27 @@ function sectionId(section: PackageContentSection, index: number) {
 
 function buildSections(pkg: PublicPackage, overviewHtml?: string): AccordionSection[] {
   const sections: AccordionSection[] = []
+  const sectionIds = new Set<string>()
+
+  function uniqueSectionId(id: string) {
+    if (!sectionIds.has(id)) {
+      sectionIds.add(id)
+      return id
+    }
+
+    let index = 2
+    let nextId = `${id}-${index}`
+    while (sectionIds.has(nextId)) {
+      index += 1
+      nextId = `${id}-${index}`
+    }
+    sectionIds.add(nextId)
+    return nextId
+  }
 
   if (overviewHtml) {
     sections.push({
-      id: "overview",
+      id: uniqueSectionId("overview"),
       title: "Overview",
       countLabel: "Start here",
       type: "html",
@@ -48,7 +65,7 @@ function buildSections(pkg: PublicPackage, overviewHtml?: string): AccordionSect
   for (const [index, section] of pkg.contentSections.entries()) {
     if (!section.title || section.lines.length === 0) continue
     sections.push({
-      id: sectionId(section, index),
+      id: uniqueSectionId(sectionId(section, index)),
       title: section.title,
       countLabel: `${section.lines.length} ${section.lines.length === 1 ? "point" : "points"}`,
       type: "lines",
@@ -58,7 +75,7 @@ function buildSections(pkg: PublicPackage, overviewHtml?: string): AccordionSect
 
   if (pkg.faqs.length > 0) {
     sections.push({
-      id: "faqs",
+      id: uniqueSectionId("faqs"),
       title: "FAQs",
       countLabel: `${pkg.faqs.length} answers`,
       type: "faqs",
@@ -88,8 +105,8 @@ function LinesContent({ lines }: { lines: string[] }) {
 function FaqContent({ faqs }: { faqs: FaqItem[] }) {
   return (
     <div className="grid gap-3">
-      {faqs.map((faq) => (
-        <article key={faq.question} className="rounded-lg bg-secondary/45 p-4">
+      {faqs.map((faq, index) => (
+        <article key={`${faq.question}-${index}`} className="rounded-lg bg-secondary/45 p-4">
           <h3 className="flex items-start gap-2 font-semibold">
             <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             {faq.question}

@@ -118,9 +118,9 @@ export default async function AdminSeoPage() {
                 <td className="px-4 py-4">
                   {row.warnings.length ? (
                     <ul className="flex flex-wrap gap-2">
-                      {row.warnings.map((warning) => (
+                      {row.warnings.map((warning, warningIndex) => (
                         <li
-                          key={warning}
+                          key={`${row.type}-${row.id}-warning-${warningIndex}-${warning}`}
                           className="rounded-full bg-destructive/10 px-3 py-1 text-xs font-semibold text-destructive"
                         >
                           {warning}

@@ -115,9 +115,9 @@ export default async function PackageDetailPage({
           </div>
           {pkg.services.length ? (
             <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide text-white/90">
-              {pkg.services.map((service) => (
+              {pkg.services.map((service, serviceIndex) => (
                 <span
-                  key={service}
+                  key={`${pkg.id || pkg.slug}-service-${serviceIndex}-${service}`}
                   className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 backdrop-blur"
                 >
                   {service}
@@ -139,8 +139,11 @@ export default async function PackageDetailPage({
                   Gallery
                 </h2>
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {pkg.galleryImages.map((image) => (
-                    <div key={image.id || image.url} className="relative h-64 overflow-hidden rounded-xl">
+                  {pkg.galleryImages.map((image, imageIndex) => (
+                    <div
+                      key={`${image.id || image.url}-${imageIndex}`}
+                      className="relative h-64 overflow-hidden rounded-xl"
+                    >
                       <Image
                         src={image.url}
                         alt={image.alt}

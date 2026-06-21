@@ -115,8 +115,11 @@ export default async function BlogDetailPage({
             <section className="mt-12">
               <h2 className="font-heading text-3xl font-semibold">FAQs</h2>
               <div className="mt-5 space-y-4">
-                {blog.faqs.map((faq) => (
-                  <article key={faq.question} className="rounded-xl border border-border bg-card p-5">
+                {blog.faqs.map((faq, faqIndex) => (
+                  <article
+                    key={`${faq.question}-${faqIndex}`}
+                    className="rounded-xl border border-border bg-card p-5"
+                  >
                     <h3 className="font-semibold">{faq.question}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {faq.answer}

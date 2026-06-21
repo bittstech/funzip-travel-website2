@@ -152,9 +152,9 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
           transition={{ duration: 0.9, delay: 0.9 }}
           className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4"
         >
-          {trustItems.map((item) => (
+          {trustItems.map((item, itemIndex) => (
             <div
-              key={item.label}
+              key={`${item.label}-${itemIndex}`}
               className="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-4 text-center backdrop-blur-md"
             >
               <item.icon className="h-5 w-5 text-primary-foreground" />

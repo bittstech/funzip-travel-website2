@@ -28,7 +28,7 @@ export function Blogs({ blogs = fallbackBlogs }: { blogs?: PublicBlog[] }) {
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {blogs.map((blog, i) => (
             <motion.article
-              key={blog.title}
+              key={`${blog.id || blog.slug || blog.title}-${i}`}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}

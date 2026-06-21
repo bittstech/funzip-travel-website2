@@ -63,7 +63,7 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
       >
         {packages.map((pkg, i) => (
           <motion.article
-            key={pkg.id}
+            key={`${pkg.id || pkg.slug || pkg.title}-${i}`}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
@@ -99,9 +99,9 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
               <ul className="mt-4 flex flex-col gap-2">
                 {(pkg.inclusions.length ? pkg.inclusions : ["Hotels", "Transport", "Sightseeing"])
                   .slice(0, 3)
-                  .map((h) => (
+                  .map((h, hIndex) => (
                   <li
-                    key={h}
+                    key={`${pkg.id || pkg.slug || pkg.title}-inclusion-${hIndex}-${h}`}
                     className="flex items-center gap-2 text-sm text-foreground/80"
                   >
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/10 text-accent">

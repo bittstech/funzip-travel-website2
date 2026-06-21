@@ -29,7 +29,7 @@ export function Faqs() {
           {faqs.map((faq, i) => {
             const isOpen = open === i
             return (
-              <Reveal key={faq.q} delay={i * 0.04}>
+              <Reveal key={`${faq.q}-${i}`} delay={i * 0.04}>
                 <div className="overflow-hidden rounded-2xl border border-border bg-card">
                   <button
                     type="button"
