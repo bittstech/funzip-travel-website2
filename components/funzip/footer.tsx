@@ -19,6 +19,12 @@ const socials = [
   { icon: AtSign, label: "Twitter" },
 ]
 
+const mapEmbedSrc =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3303.305363851662!2d74.8345174755632!3d34.11293137313413!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e18550f14035a3%3A0xd8474e2c549a4135!2sFunzip%20Kashmir%20Tour%20and%20Travels!5e0!3m2!1sen!2sin!4v1782034509916!5m2!1sen!2sin"
+
+const mapDirectionsUrl =
+  "https://www.google.com/maps/search/?api=1&query=Funzip%20Kashmir%20Tour%20and%20Travels"
+
 export function Footer({
   settings = fallbackSettings,
   packages = fallbackPackages,
@@ -109,6 +115,42 @@ export function Footer({
                 {settings.address || "Kashmir, India"}
               </li>
             </ul>
+          </div>
+        </div>
+
+        <div className="mt-12 overflow-hidden rounded-2xl border border-background/15 bg-background/5">
+          <div className="grid gap-0 lg:grid-cols-[minmax(0,0.85fr)_minmax(360px,1.15fr)]">
+            <div className="flex flex-col justify-center p-5 sm:p-6 lg:p-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+                Find Us
+              </p>
+              <h3 className="mt-2 font-heading text-2xl font-semibold text-background sm:text-3xl">
+                Funzip Kashmir Tour and Travels
+              </h3>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-background/70">
+                {settings.address || "Kashmir, India"}
+              </p>
+              <a
+                href={mapDirectionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
+              >
+                <MapPin className="h-4 w-4" />
+                Open Directions
+              </a>
+            </div>
+
+            <div className="min-h-[260px] bg-background/10 p-2 sm:p-3">
+              <iframe
+                title="Funzip Kashmir Tour and Travels location"
+                src={mapEmbedSrc}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-full min-h-[260px] w-full rounded-xl border-0 sm:min-h-[320px] lg:min-h-[360px]"
+              />
+            </div>
           </div>
         </div>
 
