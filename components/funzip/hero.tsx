@@ -48,7 +48,7 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
     <section
       ref={ref}
       id="home"
-      className="relative isolate h-[100svh] min-h-[640px] overflow-hidden bg-black"
+      className="relative isolate min-h-[100svh] overflow-hidden bg-black"
     >
       {/* Parallax background */}
       <motion.div
@@ -96,7 +96,7 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
 
       <motion.div
         style={{ y: textY, opacity: fade }}
-        className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8"
+        className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center justify-center px-4 py-28 text-center sm:px-6 sm:py-32 lg:px-8"
       >
         {/* <motion.span
           initial={{ opacity: 0, y: 20 }}
@@ -150,7 +150,7 @@ export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.9 }}
-          className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4"
+          className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:mt-12 sm:grid-cols-4"
         >
           {trustItems.map((item, itemIndex) => (
             <div

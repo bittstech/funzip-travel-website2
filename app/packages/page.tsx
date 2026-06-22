@@ -48,7 +48,7 @@ export default async function PackagesPage() {
         ]}
       />
       <Navbar />
-      <section className="relative isolate min-h-[52svh] overflow-hidden bg-black px-5 pb-16 pt-36 text-white lg:px-8">
+      <section className="relative isolate min-h-[52svh] overflow-hidden bg-black px-4 pb-16 pt-32 text-white sm:px-6 sm:pt-36 lg:px-8">
         <Image
           src={heroImage.url}
           alt={heroImage.alt}
@@ -62,7 +62,7 @@ export default async function PackagesPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
             Curated Journeys
           </p>
-          <h1 className="mt-3 font-heading text-5xl font-semibold">
+          <h1 className="mt-3 font-heading text-4xl font-semibold leading-tight sm:text-5xl">
             Kashmir Tour Packages
           </h1>
           <p className="mt-4 max-w-2xl text-white/85">
@@ -72,12 +72,12 @@ export default async function PackagesPage() {
         </div>
       </section>
 
-      <section className="px-5 py-16 lg:px-8">
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {packages.map((pkg) => (
             <article
               key={pkg.id}
-              className="group overflow-hidden rounded-xl border border-border bg-card"
+              className="group min-w-0 overflow-hidden rounded-xl border border-border bg-card"
             >
               <div className="relative h-56 overflow-hidden">
                 <Image
@@ -88,17 +88,17 @@ export default async function PackagesPage() {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
-              <div className="p-5">
+              <div className="min-w-0 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                   {pkg.duration || pkg.location || "Kashmir"}
                 </p>
-                <h2 className="mt-2 font-heading text-2xl font-semibold">
+                <h2 className="mt-2 font-heading text-2xl font-semibold leading-tight">
                   {pkg.title}
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {pkg.shortDescription}
                 </p>
-                <div className="mt-5 flex items-center justify-between gap-4">
+                <div className="mt-5 flex flex-col gap-4 min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between">
                   <span className="text-sm font-semibold">{pkg.priceLabel}</span>
                   <Link
                     href={`/packages/${pkg.slug}`}

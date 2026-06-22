@@ -57,19 +57,20 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
         </div>
       </div>
 
-      <div
-        ref={scrollerRef}
-        className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-4 sm:gap-6 sm:px-6 lg:px-8"
-      >
-        {packages.map((pkg, i) => (
-          <motion.article
-            key={`${pkg.id || pkg.slug || pkg.title}-${i}`}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6, delay: (i % 3) * 0.1 }}
-            className="group flex w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl sm:w-[340px]"
-          >
+      <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          ref={scrollerRef}
+          className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 sm:gap-6"
+        >
+          {packages.map((pkg, i) => (
+            <motion.article
+              key={`${pkg.id || pkg.slug || pkg.title}-${i}`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: (i % 3) * 0.1 }}
+              className="group flex w-[min(84vw,20rem)] shrink-0 snap-start flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl sm:w-80 lg:w-[21.25rem]"
+            >
             <div className="relative h-52 overflow-hidden">
               <Image
                 src={pkg.coverImage.url || "/placeholder.svg"}
@@ -88,11 +89,11 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
               </span>
             </div>
 
-            <div className="flex flex-1 flex-col p-6">
-              <h3 className="font-heading text-2xl font-semibold leading-tight">
+            <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+              <h3 className="font-heading text-2xl font-semibold leading-tight break-words">
                 {pkg.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground break-words">
                 {pkg.shortDescription}
               </p>
 
@@ -102,17 +103,17 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
                   .map((h, hIndex) => (
                   <li
                     key={`${pkg.id || pkg.slug || pkg.title}-inclusion-${hIndex}-${h}`}
-                    className="flex items-center gap-2 text-sm text-foreground/80"
+                    className="flex items-start gap-2 text-sm text-foreground/80"
                   >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/10 text-accent">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
                       <Check className="h-3 w-3" />
                     </span>
-                    {h}
+                    <span className="min-w-0 break-words">{h}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-6 flex flex-1 items-end gap-3">
+              <div className="mt-6 flex flex-1 flex-col items-stretch justify-end gap-3 min-[380px]:flex-row">
                 <Link
                   href={`/packages/${pkg.slug}`}
                   className="flex-1 rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
@@ -127,8 +128,9 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
                 </a>
               </div>
             </div>
-          </motion.article>
-        ))}
+            </motion.article>
+          ))}
+        </div>
       </div>
     </section>
   )

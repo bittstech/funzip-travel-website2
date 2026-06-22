@@ -33,14 +33,14 @@ export function Contact({
     <section id="contact" className="relative py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <div className="overflow-hidden rounded-[2rem] border border-border bg-gradient-to-br from-secondary/70 via-card to-background shadow-xl">
-            <div className="grid lg:grid-cols-2">
-              <div className="flex flex-col justify-between gap-8 p-8 lg:p-12">
+          <div className="overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-secondary/70 via-card to-background shadow-xl sm:rounded-[2rem]">
+            <div className="grid min-w-0 lg:grid-cols-2">
+              <div className="flex min-w-0 flex-col justify-between gap-8 p-5 sm:p-8 lg:p-12">
                 <div>
                   <span className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
                     Let&apos;s Plan Together
                   </span>
-                  <h2 className="mt-3 font-heading text-4xl font-semibold leading-tight text-balance sm:text-5xl">
+                  <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-balance sm:text-5xl">
                     Ready to Plan Your Kashmir Trip?
                   </h2>
                   <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
@@ -55,7 +55,7 @@ export function Contact({
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Phone className="h-5 w-5" />
                     </span>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="min-w-0 text-sm font-medium text-foreground">
                       {phone}
                     </span>
                   </li>
@@ -63,7 +63,7 @@ export function Contact({
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <MessageCircle className="h-5 w-5" />
                     </span>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="min-w-0 text-sm font-medium text-foreground">
                       WhatsApp: {phone}
                     </span>
                   </li>
@@ -71,7 +71,7 @@ export function Contact({
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Mail className="h-5 w-5" />
                     </span>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="min-w-0 text-sm font-medium text-foreground">
                       {settings.email || "hello@funzip.travel"}
                     </span>
                   </li>
@@ -79,14 +79,14 @@ export function Contact({
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <MapPin className="h-5 w-5" />
                     </span>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="min-w-0 text-sm font-medium text-foreground">
                       {settings.address || "Kashmir, India"}
                     </span>
                   </li>
                 </ul>
               </div>
 
-              <div className="bg-card/60 p-8 backdrop-blur lg:p-12">
+              <div className="min-w-0 bg-card/60 p-5 backdrop-blur sm:p-8 lg:p-12">
                 {state.ok ? (
                   <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
                     <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-accent">

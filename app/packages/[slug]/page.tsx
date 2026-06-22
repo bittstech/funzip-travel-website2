@@ -78,7 +78,7 @@ export default async function PackageDetailPage({
         ].filter(Boolean) as any}
       />
       <Navbar />
-      <section className="relative isolate min-h-[70svh] overflow-hidden bg-black px-5 pb-16 pt-36 text-white lg:px-8">
+      <section className="relative isolate min-h-[70svh] overflow-hidden bg-black px-4 pb-16 pt-32 text-white sm:px-6 sm:pt-36 lg:px-8">
         <Image
           src={pkg.coverImage.url}
           alt={pkg.coverImage.alt}
@@ -92,7 +92,7 @@ export default async function PackageDetailPage({
           <Link href="/packages" className="text-sm font-semibold text-white/85">
             Packages
           </Link>
-          <h1 className="mt-5 max-w-4xl font-heading text-5xl font-semibold leading-tight sm:text-6xl">
+          <h1 className="mt-5 max-w-4xl font-heading text-4xl font-semibold leading-tight sm:text-6xl">
             {pkg.title}
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90">
@@ -128,9 +128,9 @@ export default async function PackageDetailPage({
         </div>
       </section>
 
-      <section className="px-5 py-16 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_360px]">
-          <div className="space-y-10">
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,360px)]">
+          <div className="min-w-0 space-y-10">
             <PackageInfoAccordion pkg={pkg} overviewHtml={overviewHtml} />
 
             {pkg.galleryImages.length ? (
@@ -159,7 +159,7 @@ export default async function PackageDetailPage({
 
           </div>
 
-          <aside className="h-fit rounded-xl border border-border bg-card p-5 lg:sticky lg:top-24">
+          <aside className="h-fit min-w-0 rounded-xl border border-border bg-card p-5 lg:sticky lg:top-24">
             <h2 className="font-heading text-2xl font-semibold">
               Book This Trip
             </h2>
