@@ -3,7 +3,6 @@
 import { useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { ArrowLeft, ArrowRight, Clock, Check } from "lucide-react"
 import { Reveal } from "./reveal"
 import type { PublicPackage } from "@/lib/cms/types"
@@ -63,31 +62,27 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
           className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 sm:gap-6"
         >
           {packages.map((pkg, i) => (
-            <motion.article
+            <article
               key={`${pkg.id || pkg.slug || pkg.title}-${i}`}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: (i % 3) * 0.1 }}
               className="group flex w-[min(84vw,20rem)] shrink-0 snap-start flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl sm:w-80 lg:w-[21.25rem]"
             >
-            <div className="relative h-52 overflow-hidden">
-              <Image
-                src={pkg.coverImage.url || "/placeholder.svg"}
-                alt={pkg.coverImage.alt}
-                fill
-                sizes="(min-width: 1024px) 340px, 300px"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <span className="absolute right-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow">
-                {pkg.priceLabel}
-              </span>
-              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
-              <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
-                <Clock className="h-3.5 w-3.5" />
-                {pkg.duration}
-              </span>
-            </div>
+              <div className="relative h-52 overflow-hidden">
+                <Image
+                  src={pkg.coverImage.url || "/placeholder.svg"}
+                  alt={pkg.coverImage.alt}
+                  fill
+                  sizes="(min-width: 1024px) 340px, 300px"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <span className="absolute right-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow">
+                  {pkg.priceLabel}
+                </span>
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
+                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
+                  <Clock className="h-3.5 w-3.5" />
+                  {pkg.duration}
+                </span>
+              </div>
 
             <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
               <h3 className="font-heading text-2xl font-semibold leading-tight break-words">
@@ -128,7 +123,7 @@ export function Packages({ packages = fallbackPackages }: { packages?: PublicPac
                 </a>
               </div>
             </div>
-            </motion.article>
+            </article>
           ))}
         </div>
       </div>

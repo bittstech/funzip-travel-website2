@@ -227,43 +227,15 @@ export async function getPackageBySlug(slug: string) {
 }
 
 export async function getLatestBlogs(limit = 6) {
-  return withDatabaseFallback(async (db) => {
-    const records = await db.blog.findMany({
-      where: { isPublished: true },
-      include: mediaInclude,
-      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-      take: limit,
-    })
-
-    if (records.length === 0) return fallbackBlogs.slice(0, limit)
-    return records.map(toBlog)
-  }, fallbackBlogs.slice(0, limit))
+  return fallbackBlogs.slice(0, limit)
 }
 
 export async function getPublishedBlogs() {
-  return withDatabaseFallback(async (db) => {
-    const records = await db.blog.findMany({
-      where: { isPublished: true },
-      include: mediaInclude,
-      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-    })
-
-    if (records.length === 0) return fallbackBlogs
-    return records.map(toBlog)
-  }, fallbackBlogs)
+  return fallbackBlogs
 }
 
 export async function getBlogBySlug(slug: string) {
-  const fallback = fallbackBlogs.find((blog) => blog.slug === slug) || null
-
-  return withDatabaseFallback(async (db) => {
-    const record = await db.blog.findFirst({
-      where: { slug, isPublished: true },
-      include: mediaInclude,
-    })
-
-    return record ? toBlog(record) : fallback
-  }, fallback)
+  return fallbackBlogs.find((blog) => blog.slug === slug) || null
 }
 
 export async function getGalleryImages(limit?: number) {

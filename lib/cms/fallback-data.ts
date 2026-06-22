@@ -148,9 +148,9 @@ export const fallbackGalleryImages: PublicGalleryImage[] = galleryItems.map(
 export const fallbackBlogs: PublicBlog[] = blogs.map((blog, index) => ({
   id: `fallback-blog-${index}`,
   title: blog.title,
-  slug: slugify(blog.title),
+  slug: blog.slug || slugify(blog.title),
   excerpt: blog.excerpt,
-  content: `# ${blog.title}\n\n${blog.excerpt}\n\nPlanning a Kashmir trip becomes easier when you balance weather, route timing, hotels, and local guidance. Funzip helps you shape a comfortable itinerary around your dates and budget.`,
+  content: blog.content,
   coverImage: {
     url: blog.image,
     alt: blog.title,
@@ -159,10 +159,10 @@ export const fallbackBlogs: PublicBlog[] = blogs.map((blog, index) => ({
   },
   authorName: "Funzip Travel Team",
   category: blog.category,
-  tags: [blog.category, "Kashmir"],
-  faqs: [],
-  metaTitle: `${blog.title} | Funzip Kashmir Tour & Travels`,
-  metaDescription: blog.excerpt,
+  tags: blog.tags,
+  faqs: blog.faqs,
+  metaTitle: blog.metaTitle,
+  metaDescription: blog.metaDescription,
   ogImage: {
     url: blog.image,
     alt: blog.title,
