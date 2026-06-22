@@ -13,7 +13,7 @@ export const packages: Package[] = [
     image: "/images/dal-lake.png",
     duration: "4 Nights / 5 Days",
     description:
-      "The perfect first taste of Kashmir covering Srinagar's lakes, gardens, and gentle valley escapes.",
+      "A perfect first Kashmir trip covering Srinagar's lakes, gardens, and scenic valley escapes.",
     highlights: ["Dal Lake Shikara", "Mughal Gardens", "Houseboat Stay"],
     price: "₹12,999",
   },
@@ -22,7 +22,7 @@ export const packages: Package[] = [
     image: "/images/gulmarg.png",
     duration: "6 Nights / 7 Days",
     description:
-      "Our signature circuit linking the meadows of Gulmarg, the valleys of Pahalgam, and Srinagar's charm.",
+      "Our signature route covering Srinagar's charm, Gulmarg's meadows, and Pahalgam's valleys.",
     highlights: ["Gondola Ride", "Lidder Valley", "Local Sightseeing"],
     price: "₹19,499",
   },
@@ -31,7 +31,7 @@ export const packages: Package[] = [
     image: "/images/honeymoon.png",
     duration: "5 Nights / 6 Days",
     description:
-      "A romantic itinerary crafted for couples with candlelight dinners and private shikara rides.",
+      "A romantic Kashmir itinerary for couples, with candlelight dinners and private Shikara rides.",
     highlights: ["Candlelight Dinner", "Private Shikara", "Luxury Stay"],
     price: "₹24,999",
   },
@@ -40,7 +40,7 @@ export const packages: Package[] = [
     image: "/images/gurez.png",
     duration: "5 Nights / 6 Days",
     description:
-      "Venture beyond the crowds into the untouched beauty of Gurez, framed by Habba Khatoon peak.",
+      "Travel beyond the usual route into the untouched beauty of Gurez, framed by Habba Khatoon Peak.",
     highlights: ["Habba Khatoon Peak", "Kishanganga River", "Village Walks"],
     price: "₹21,999",
   },
@@ -49,7 +49,7 @@ export const packages: Package[] = [
     image: "/images/family.png",
     duration: "6 Nights / 7 Days",
     description:
-      "Comfortable, well-paced travel designed for families with kids and elders in mind.",
+      "A comfortable, well-paced Kashmir trip designed for families with children and elders.",
     highlights: ["Comfort Hotels", "Easy Sightseeing", "Kid Friendly"],
     price: "₹17,499",
   },
@@ -58,7 +58,7 @@ export const packages: Package[] = [
     image: "/images/luxury.png",
     duration: "7 Nights / 8 Days",
     description:
-      "Five-star stays, premium transport, and curated experiences across the entire valley.",
+      "Premium stays, private transport, and curated experiences across Kashmir's most beautiful places.",
     highlights: ["5-Star Hotels", "Premium Transport", "Curated Dining"],
     price: "₹39,999",
   },

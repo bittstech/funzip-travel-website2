@@ -49,8 +49,8 @@ export default async function AboutPage() {
           <p className="mt-5 leading-relaxed text-muted-foreground">
             Funzip Kashmir Tour & Travels creates handcrafted Kashmir journeys
             with hotels, transport, sightseeing, and practical local support.
-            The CMS now lets the team keep packages, blogs, gallery images, and
-            SEO details fresh without changing code.
+            We help you plan a smooth, comfortable trip with clear inclusions,
+            reliable guidance, and itineraries shaped around your travel style.
           </p>
         </div>
         <div className="relative mx-auto h-[420px] w-full max-w-xl overflow-hidden rounded-2xl">

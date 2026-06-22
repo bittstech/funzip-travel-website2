@@ -100,7 +100,7 @@ export function Footer({
           </div>
 
           <div>
-            <h3 className="font-heading text-lg font-semibold">Get In Touch</h3>
+            <h3 className="font-heading text-lg font-semibold">Get in Touch</h3>
             <ul className="mt-4 flex flex-col gap-3">
               <li className="flex items-center gap-2.5 text-sm text-background/70">
                 <Phone className="h-4 w-4 text-primary" />
@@ -125,7 +125,7 @@ export function Footer({
                 Find Us
               </p>
               <h3 className="mt-2 font-heading text-2xl font-semibold text-background sm:text-3xl">
-                Funzip Kashmir Tour and Travels
+                Funzip Kashmir Tour & Travels
               </h3>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-background/70">
                 {settings.address || "Kashmir, India"}
@@ -143,7 +143,7 @@ export function Footer({
 
             <div className="min-h-[260px] bg-background/10 p-2 sm:p-3">
               <iframe
-                title="Funzip Kashmir Tour and Travels location"
+                title="Funzip Kashmir Tour & Travels location"
                 src={mapEmbedSrc}
                 loading="lazy"
                 allowFullScreen

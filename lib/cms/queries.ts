@@ -142,88 +142,19 @@ export async function getSiteSettings(): Promise<SiteSettingsPublic> {
 }
 
 export async function getHeroSlides(): Promise<PublicHeroSlide[]> {
-  return withDatabaseFallback(async (db) => {
-    const slides = await db.heroSlide.findMany({
-      where: { isActive: true },
-      include: { image: true, mobileImage: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-    })
-
-    const renderableSlides = slides.filter((slide) =>
-      localUploadExists(slide.image.storageUrl),
-    )
-
-    if (renderableSlides.length === 0) return fallbackHeroSlides
-
-    return renderableSlides.map((slide) => ({
-      id: slide.id,
-      title: slide.title,
-      subtitle: slide.subtitle,
-      image: imageRef(slide.image, slide.title, "/images/hero-kashmir.png"),
-      mobileImage: slide.mobileImage && localUploadExists(slide.mobileImage.storageUrl)
-        ? imageRef(slide.mobileImage, slide.title, "/images/hero-kashmir.png")
-        : null,
-      ctaText: slide.ctaText,
-      ctaUrl: slide.ctaUrl,
-    }))
-  }, fallbackHeroSlides)
+  return fallbackHeroSlides
 }
 
 export async function getFeaturedPackages(limit = 6) {
-  return withDatabaseFallback(async (db) => {
-    const records = await db.package.findMany({
-      where: { isFeatured: true },
-      include: mediaInclude,
-      orderBy: [{ isPublished: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
-      take: limit,
-    })
-
-    if (records.length > 0) return records.map((record) => toPackage(record))
-
-    const latest = await db.package.findMany({
-      include: mediaInclude,
-      orderBy: [{ isPublished: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
-      take: limit,
-    })
-
-    if (latest.length === 0) return fallbackPackages.slice(0, limit)
-    return latest.map((record) => toPackage(record))
-  }, fallbackPackages.slice(0, limit))
+  return fallbackPackages.slice(0, limit)
 }
 
 export async function getPublishedPackages() {
-  return withDatabaseFallback(async (db) => {
-    const records = await db.package.findMany({
-      include: mediaInclude,
-      orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
-    })
-
-    if (records.length === 0) return fallbackPackages
-    return records.map((record) => toPackage(record))
-  }, fallbackPackages)
+  return fallbackPackages
 }
 
 export async function getPackageBySlug(slug: string) {
-  const fallback = fallbackPackages.find((pkg) => pkg.slug === slug) || null
-
-  return withDatabaseFallback(async (db) => {
-    const record = await db.package.findFirst({
-      where: { slug },
-      include: mediaInclude,
-    })
-
-    if (!record) return fallback
-
-    const galleryIds = toStringArray(record.galleryImageIds)
-    const galleryImages =
-      galleryIds.length > 0
-        ? await db.mediaAsset.findMany({
-            where: { id: { in: galleryIds }, isActive: true },
-          })
-        : []
-
-    return toPackage(record, galleryImages)
-  }, fallback)
+  return fallbackPackages.find((pkg) => pkg.slug === slug) || null
 }
 
 export async function getLatestBlogs(limit = 6) {

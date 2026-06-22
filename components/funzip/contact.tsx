@@ -44,7 +44,7 @@ export function Contact({
                     Ready to Plan Your Kashmir Trip?
                   </h2>
                   <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-                    Tell us your travel dates, number of people, and dream
+                    Tell us your travel dates, group size, and preferred
                     destinations. Our team will create a personalized Kashmir
                     itinerary for you.
                   </p>
@@ -64,7 +64,7 @@ export function Contact({
                       <MessageCircle className="h-5 w-5" />
                     </span>
                     <span className="min-w-0 text-sm font-medium text-foreground">
-                      WhatsApp: {phone}
+                      WhatsApp: +{whatsapp}
                     </span>
                   </li>
                   <li className="flex items-center gap-3">
@@ -125,16 +125,16 @@ export function Contact({
                       <input
                         name="travelMonth"
                         type="text"
-                        placeholder="Travel Month"
-                        aria-label="Travel Month"
+                        placeholder="Preferred Travel Month"
+                        aria-label="Preferred Travel Month"
                         className={inputClass}
                       />
                       <input
                         name="numberOfPeople"
                         type="number"
                         min={1}
-                        placeholder="Number of People"
-                        aria-label="Number of People"
+                        placeholder="Number of Travelers"
+                        aria-label="Number of Travelers"
                         className={inputClass}
                       />
                     </div>
@@ -164,7 +164,7 @@ export function Contact({
                       disabled={pending}
                       className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:scale-[1.02] disabled:cursor-wait disabled:opacity-70"
                     >
-                      {pending ? "Sending..." : "Get Free Quote"}
+                      {pending ? "Sending..." : "Get a Free Quote"}
                       <Send className="h-4 w-4" />
                     </button>
 

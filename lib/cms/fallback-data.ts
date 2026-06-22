@@ -33,9 +33,9 @@ export const fallbackSettings: SiteSettingsPublic = {
 export const fallbackHeroSlides: PublicHeroSlide[] = [
   {
     id: "fallback-hero",
-    title: "Discover Kashmir With Funzip",
+    title: "Visit Kashmir with Funzip",
     subtitle:
-      "Handcrafted Kashmir tour packages for families, couples, honeymooners, and adventure travelers.",
+      "Beautifully planned Kashmir tour packages for families, couples, honeymooners, and adventure travelers.",
     image: {
       url: "/naweedey-XHG0uFAlEGM-unsplash.jpg",
       alt: "Cinematic view of a Kashmir valley with snow-capped mountains and Dal Lake at golden hour",
