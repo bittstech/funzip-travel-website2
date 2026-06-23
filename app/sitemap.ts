@@ -5,6 +5,8 @@ import {
   getSiteSettings,
 } from "@/lib/cms/queries"
 
+export const dynamic = "force-dynamic"
+
 function siteUrl(settingsSiteUrl: string, route: string) {
   const base = settingsSiteUrl.replace(/\/$/, "")
   const path = route.startsWith("/") ? route : `/${route}`

@@ -185,8 +185,6 @@ export async function getFeaturedPackages(limit = 6) {
       take: limit,
     })
 
-    if (records.length === 0) return fallbackPackages.slice(0, limit)
-
     return records.map((record) => toPackage(record))
   }, fallbackPackages.slice(0, limit))
 }
@@ -203,8 +201,6 @@ export async function getPublishedPackages() {
       ],
     })
 
-    if (records.length === 0) return fallbackPackages
-
     return records.map((record) => toPackage(record))
   }, fallbackPackages)
 }
@@ -219,7 +215,7 @@ export async function getPackageBySlug(slug: string) {
       include: mediaInclude,
     })
 
-    if (!record) return fallbackPackage
+    if (!record) return null
     if (!record.isPublished) return null
 
     const galleryImageIds = toStringArray(record.galleryImageIds)
@@ -251,8 +247,6 @@ export async function getLatestBlogs(limit = 6) {
       take: limit,
     })
 
-    if (records.length === 0) return fallbackBlogs.slice(0, limit)
-
     return records.map((record) => toBlog(record))
   }, fallbackBlogs.slice(0, limit))
 }
@@ -264,8 +258,6 @@ export async function getPublishedBlogs() {
       include: mediaInclude,
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
     })
-
-    if (records.length === 0) return fallbackBlogs
 
     return records.map((record) => toBlog(record))
   }, fallbackBlogs)
@@ -280,7 +272,7 @@ export async function getBlogBySlug(slug: string) {
       include: mediaInclude,
     })
 
-    if (!record) return fallbackBlog
+    if (!record) return null
     if (!record.isPublished) return null
 
     return toBlog(record)
