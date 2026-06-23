@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import { Geist_Mono } from 'next/font/google'
 import { Cormorant_Garamond } from 'next/font/google'
+import { getSiteUrl } from '@/lib/cms/utils'
 import './globals.css'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
@@ -12,6 +13,7 @@ const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
 })
+const siteUrl = getSiteUrl()
 
 const themeScript = `
 (() => {
@@ -26,6 +28,7 @@ const themeScript = `
 `
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: 'Funzip | Premium Kashmir Tour & Travel Packages',
   description:
     'Discover Kashmir with Funzip. Handcrafted Kashmir tour packages for families, couples, honeymooners, and adventure travelers. Hotels, transport, and sightseeing included.',
@@ -38,6 +41,11 @@ export const metadata: Metadata = {
     'Funzip travel',
   ],
   applicationName: 'Funzip Kashmir Tour & Travels',
+  alternates: {
+    types: {
+      'text/plain': '/llms.txt',
+    },
+  },
 }
 
 export const viewport: Viewport = {

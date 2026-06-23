@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import type { ImageRef, SiteSettingsPublic } from "@/lib/cms/types"
-import { absoluteUrl, seoTitle, shortDescription } from "@/lib/cms/utils"
+import { getSiteUrl, seoTitle, shortDescription } from "@/lib/cms/utils"
 
 type MetadataInput = {
   title: string
@@ -13,9 +13,28 @@ type MetadataInput = {
   settings?: SiteSettingsPublic
 }
 
-function imageUrl(image: ImageRef | string | null | undefined) {
+function siteBase(settings?: SiteSettingsPublic) {
+  return (settings?.siteUrl || getSiteUrl()).replace(/\/$/, "")
+}
+
+function siteAbsoluteUrl(
+  pathOrUrl: string | null | undefined,
+  settings?: SiteSettingsPublic,
+) {
+  if (!pathOrUrl) return siteBase(settings)
+  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl
+  const path = pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`
+  return `${siteBase(settings)}${path}`
+}
+
+function imageUrl(
+  image: ImageRef | string | null | undefined,
+  settings?: SiteSettingsPublic,
+) {
   if (!image) return undefined
-  return typeof image === "string" ? absoluteUrl(image) : absoluteUrl(image.url)
+  return typeof image === "string"
+    ? siteAbsoluteUrl(image, settings)
+    : siteAbsoluteUrl(image.url, settings)
 }
 
 export function buildMetadata({
@@ -30,10 +49,12 @@ export function buildMetadata({
 }: MetadataInput): Metadata {
   const resolvedTitle = seoTitle(title, settings?.siteName)
   const resolvedDescription = shortDescription(description)
-  const resolvedCanonical = canonical || absoluteUrl(path)
-  const resolvedImage = imageUrl(image || settings?.defaultOgImage)
+  const resolvedCanonical = canonical || siteAbsoluteUrl(path, settings)
+  const resolvedImage = imageUrl(image || settings?.defaultOgImage, settings)
+  const base = siteBase(settings)
 
   return {
+    metadataBase: new URL(base),
     title: resolvedTitle,
     description: resolvedDescription,
     keywords,

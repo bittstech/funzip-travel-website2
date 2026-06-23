@@ -3,6 +3,7 @@
 import { type FormEvent, useActionState, useState } from "react"
 import { ImageUploadInput } from "./image-upload-input"
 import { PackageSectionsInput } from "./package-sections-input"
+import { PromptTemplatePanel } from "./prompt-template-panel"
 import { RichTextEditor } from "./rich-text-editor"
 import type { AdminFormState } from "@/app/admin/actions"
 import {
@@ -17,6 +18,31 @@ const inputClass =
 const errorInputClass = "border-destructive focus:border-destructive focus:ring-destructive/20"
 const labelClass = "block text-sm font-semibold"
 const initialFormState: AdminFormState = { ok: false, message: "", fieldErrors: {} }
+const packagePromptTemplate = `Act as a Kashmir tour planner and SEO copywriter for Funzip Kashmir Tour & Travels.
+
+Create a user-attractive, SEO-friendly tour package for:
+- Package theme: [family / honeymoon / luxury / adventure / offbeat]
+- Destination route: [Srinagar, Gulmarg, Pahalgam, Sonmarg, etc.]
+- Duration: [number of nights/days]
+- Traveler type: [couple / family / group / solo]
+- Starting price: [optional price]
+- Primary keyword: [main package keyword]
+- Secondary keywords: [keyword 1, keyword 2, keyword 3]
+
+Return only these sections:
+1. Package title under 60 characters
+2. URL slug
+3. Short description under 155 characters
+4. Full description in Markdown with a welcoming overview
+5. Display sections with 4-6 bullet lines each: Highlights, Inclusions, Exclusions, Must Know
+6. Day-wise itinerary in this format: Day title | Optional description
+7. 5 FAQs in this format: Question | Answer
+8. Meta title under 60 characters
+9. Meta description under 155 characters
+10. Keywords as comma-separated phrases
+11. Cover image alt text
+
+Keep the package realistic, locally useful, and conversion focused. Avoid overpromising weather-dependent activities, exact hotel names, or unavailable inclusions.`
 
 type AdminFormAction = (
   state: AdminFormState,
@@ -242,6 +268,7 @@ export function PackageForm({
                 name="shortDescription"
                 rows={3}
                 defaultValue={pkg?.shortDescription || ""}
+                placeholder="A clear, enticing summary with destination, duration, and the main traveler benefit."
                 className={`${inputStyles(shortDescriptionError)} resize-y`}
                 {...fieldA11y("shortDescription", shortDescriptionError)}
               />
@@ -412,6 +439,7 @@ export function PackageForm({
                 name="metaTitle"
                 maxLength={80}
                 defaultValue={pkg?.metaTitle || ""}
+                placeholder="Kashmir Package Name | Funzip"
                 className={inputStyles(metaTitleError)}
                 {...fieldA11y("metaTitle", metaTitleError)}
               />
@@ -424,6 +452,7 @@ export function PackageForm({
                 rows={3}
                 maxLength={180}
                 defaultValue={pkg?.metaDescription || ""}
+                placeholder="Book a Kashmir package with hotels, transport, sightseeing, and local Funzip planning support."
                 className={`${inputStyles(metaDescriptionError)} resize-y`}
                 {...fieldA11y("metaDescription", metaDescriptionError)}
               />
@@ -454,6 +483,12 @@ export function PackageForm({
       </div>
 
       <aside className="space-y-5">
+        <PromptTemplatePanel
+          title="AI Package Starter"
+          description="Copy this prompt into your AI writer, fill the brackets, then paste the result into the matching package fields."
+          prompt={packagePromptTemplate}
+        />
+
         <section className="rounded-xl border border-border bg-card p-5">
           <h2 className="font-heading text-2xl font-semibold">Publish</h2>
           <div className="mt-5 space-y-3">

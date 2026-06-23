@@ -2,6 +2,7 @@
 
 import { useActionState } from "react"
 import { ImageUploadInput } from "./image-upload-input"
+import { PromptTemplatePanel } from "./prompt-template-panel"
 import { RichTextEditor } from "./rich-text-editor"
 import type { AdminFormState } from "@/app/admin/actions"
 import { toStringArray } from "@/lib/cms/utils"
@@ -11,6 +12,27 @@ const inputClass =
 const errorInputClass = "border-destructive focus:border-destructive focus:ring-destructive/20"
 const labelClass = "block text-sm font-semibold"
 const initialFormState: AdminFormState = { ok: false, message: "", fieldErrors: {} }
+const blogPromptTemplate = `Act as an expert Kashmir travel writer and SEO editor for Funzip Kashmir Tour & Travels.
+
+Create a helpful, user-attractive, SEO-friendly blog for:
+- Topic: [blog topic]
+- Target traveler: [families / honeymoon couples / adventure travelers / first-time Kashmir visitors]
+- Primary keyword: [main keyword]
+- Secondary keywords: [keyword 1, keyword 2, keyword 3]
+- Suggested internal links: /packages, /contact, [relevant package URL]
+
+Return only these sections:
+1. Blog title under 60 characters
+2. URL slug
+3. Excerpt under 155 characters
+4. Full blog content in Markdown with H2/H3 headings, short paragraphs, and practical tips
+5. Meta title under 60 characters
+6. Meta description under 155 characters
+7. Tags as comma-separated keywords
+8. 4 FAQs in this format: Question | Answer
+9. Cover image alt text
+
+Keep the tone warm, trustworthy, and locally helpful. Avoid keyword stuffing and do not invent prices, hotel names, or unavailable activities.`
 
 type AdminFormAction = (
   state: AdminFormState,
@@ -113,6 +135,7 @@ export function BlogForm({
                 name="excerpt"
                 rows={3}
                 defaultValue={blog?.excerpt || ""}
+                placeholder="A short, benefit-led summary that invites readers to plan their Kashmir trip."
                 className={`${inputStyles(excerptError)} resize-y`}
                 {...fieldA11y("excerpt", excerptError)}
               />
@@ -180,6 +203,7 @@ export function BlogForm({
                 name="metaTitle"
                 maxLength={80}
                 defaultValue={blog?.metaTitle || ""}
+                placeholder="Kashmir Travel Guide Topic | Funzip"
                 className={inputStyles(metaTitleError)}
                 {...fieldA11y("metaTitle", metaTitleError)}
               />
@@ -192,6 +216,7 @@ export function BlogForm({
                 rows={3}
                 maxLength={180}
                 defaultValue={blog?.metaDescription || ""}
+                placeholder="Plan a better Kashmir trip with local tips, timing advice, and helpful itinerary ideas from Funzip."
                 className={`${inputStyles(metaDescriptionError)} resize-y`}
                 {...fieldA11y("metaDescription", metaDescriptionError)}
               />
@@ -212,6 +237,12 @@ export function BlogForm({
       </div>
 
       <aside className="space-y-5">
+        <PromptTemplatePanel
+          title="AI Blog Starter"
+          description="Copy this prompt into your AI writer, fill the brackets, then paste the result into the matching fields."
+          prompt={blogPromptTemplate}
+        />
+
         <section className="rounded-xl border border-border bg-card p-5">
           <h2 className="font-heading text-2xl font-semibold">Publish</h2>
           <div className="mt-5 space-y-3">

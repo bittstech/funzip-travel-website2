@@ -142,31 +142,149 @@ export async function getSiteSettings(): Promise<SiteSettingsPublic> {
 }
 
 export async function getHeroSlides(): Promise<PublicHeroSlide[]> {
-  return fallbackHeroSlides
+  return withDatabaseFallback(async (db) => {
+    const records = await db.heroSlide.findMany({
+      where: { isActive: true },
+      include: {
+        image: true,
+        mobileImage: true,
+      },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    })
+
+    if (records.length === 0) return fallbackHeroSlides
+
+    return records.map((record) => ({
+      id: record.id,
+      title: record.title,
+      subtitle: record.subtitle,
+      image: imageRef(
+        renderableAsset(record.image),
+        record.title,
+        fallbackHeroSlides[0]?.image.url || "/images/hero-kashmir.png",
+      ),
+      mobileImage: record.mobileImage
+        ? imageRef(renderableAsset(record.mobileImage), `${record.title} mobile image`)
+        : null,
+      ctaText: record.ctaText,
+      ctaUrl: record.ctaUrl,
+    }))
+  }, fallbackHeroSlides)
 }
 
 export async function getFeaturedPackages(limit = 6) {
-  return fallbackPackages.slice(0, limit)
+  return withDatabaseFallback(async (db) => {
+    const records = await db.package.findMany({
+      where: { isPublished: true },
+      include: mediaInclude,
+      orderBy: [
+        { isFeatured: "desc" },
+        { publishedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: limit,
+    })
+
+    if (records.length === 0) return fallbackPackages.slice(0, limit)
+
+    return records.map((record) => toPackage(record))
+  }, fallbackPackages.slice(0, limit))
 }
 
 export async function getPublishedPackages() {
-  return fallbackPackages
+  return withDatabaseFallback(async (db) => {
+    const records = await db.package.findMany({
+      where: { isPublished: true },
+      include: mediaInclude,
+      orderBy: [
+        { isFeatured: "desc" },
+        { publishedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+    })
+
+    if (records.length === 0) return fallbackPackages
+
+    return records.map((record) => toPackage(record))
+  }, fallbackPackages)
 }
 
 export async function getPackageBySlug(slug: string) {
-  return fallbackPackages.find((pkg) => pkg.slug === slug) || null
+  const fallbackPackage =
+    fallbackPackages.find((pkg) => pkg.slug === slug) || null
+
+  return withDatabaseFallback(async (db) => {
+    const record = await db.package.findUnique({
+      where: { slug },
+      include: mediaInclude,
+    })
+
+    if (!record) return fallbackPackage
+    if (!record.isPublished) return null
+
+    const galleryImageIds = toStringArray(record.galleryImageIds)
+    const galleryImages = galleryImageIds.length
+      ? await db.mediaAsset.findMany({
+          where: {
+            id: { in: galleryImageIds },
+            isActive: true,
+          },
+        })
+      : []
+    const galleryById = new Map(galleryImages.map((image) => [image.id, image]))
+
+    return toPackage(
+      record,
+      galleryImageIds
+        .map((imageId) => galleryById.get(imageId))
+        .filter((image): image is (typeof galleryImages)[number] => Boolean(image)),
+    )
+  }, fallbackPackage)
 }
 
 export async function getLatestBlogs(limit = 6) {
-  return fallbackBlogs.slice(0, limit)
+  return withDatabaseFallback(async (db) => {
+    const records = await db.blog.findMany({
+      where: { isPublished: true },
+      include: mediaInclude,
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      take: limit,
+    })
+
+    if (records.length === 0) return fallbackBlogs.slice(0, limit)
+
+    return records.map((record) => toBlog(record))
+  }, fallbackBlogs.slice(0, limit))
 }
 
 export async function getPublishedBlogs() {
-  return fallbackBlogs
+  return withDatabaseFallback(async (db) => {
+    const records = await db.blog.findMany({
+      where: { isPublished: true },
+      include: mediaInclude,
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    })
+
+    if (records.length === 0) return fallbackBlogs
+
+    return records.map((record) => toBlog(record))
+  }, fallbackBlogs)
 }
 
 export async function getBlogBySlug(slug: string) {
-  return fallbackBlogs.find((blog) => blog.slug === slug) || null
+  const fallbackBlog = fallbackBlogs.find((blog) => blog.slug === slug) || null
+
+  return withDatabaseFallback(async (db) => {
+    const record = await db.blog.findUnique({
+      where: { slug },
+      include: mediaInclude,
+    })
+
+    if (!record) return fallbackBlog
+    if (!record.isPublished) return null
+
+    return toBlog(record)
+  }, fallbackBlog)
 }
 
 export async function getGalleryImages(limit?: number) {
