@@ -170,14 +170,17 @@ export function parseFaqs(value: unknown): FaqItem[] {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
-      const [question, ...answerParts] = line.split("|")
-      return {
-        question: question?.trim() || "",
-        answer: answerParts.join("|").trim(),
-      }
+      const [rawQuestion, ...answerParts] = line.split("|")
+      // Strip leading "Q:" prefix (case-insensitive) from question
+      const question = (rawQuestion ?? "").trim().replace(/^Q:\s*/i, "")
+      // Strip leading "A:" prefix from answer
+      const rawAnswer = answerParts.join("|").trim()
+      const answer = rawAnswer.replace(/^A:\s*/i, "")
+      return { question, answer }
     })
     .filter((item) => item.question && item.answer)
 }
+
 
 export function parseItinerary(value: unknown): ItineraryDay[] {
   if (Array.isArray(value)) {

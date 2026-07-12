@@ -2,23 +2,24 @@
 
 import { useMemo, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { CheckCircle2, ChevronDown, FileText, HelpCircle } from "lucide-react"
-import type { FaqItem, PackageContentSection, PublicPackage } from "@/lib/cms/types"
+import { CheckCircle2, ChevronDown, FileText, HelpCircle, XCircle, Info, MapPin } from "lucide-react"
+import type { FaqItem, ItineraryDay, PublicPackage } from "@/lib/cms/types"
 
 type AccordionSection =
   | {
       id: string
       title: string
       countLabel: string
-      type: "html"
-      html: string
+      type: "lines"
+      lines: string[]
+      icon?: "check" | "cross" | "info"
     }
   | {
       id: string
       title: string
       countLabel: string
-      type: "lines"
-      lines: string[]
+      type: "itinerary"
+      days: ItineraryDay[]
     }
   | {
       id: string
@@ -28,54 +29,46 @@ type AccordionSection =
       faqs: FaqItem[]
     }
 
-function sectionId(section: PackageContentSection, index: number) {
-  return section.id || `${section.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}`
-}
-
-function buildSections(pkg: PublicPackage, overviewHtml?: string): AccordionSection[] {
+function buildSections(pkg: PublicPackage): AccordionSection[] {
   const sections: AccordionSection[] = []
-  const sectionIds = new Set<string>()
 
-  function uniqueSectionId(id: string) {
-    if (!sectionIds.has(id)) {
-      sectionIds.add(id)
-      return id
-    }
-
-    let index = 2
-    let nextId = `${id}-${index}`
-    while (sectionIds.has(nextId)) {
-      index += 1
-      nextId = `${id}-${index}`
-    }
-    sectionIds.add(nextId)
-    return nextId
-  }
-
-  if (overviewHtml) {
+  if (pkg.itinerary && pkg.itinerary.length > 0) {
     sections.push({
-      id: uniqueSectionId("overview"),
-      title: "Overview",
-      countLabel: "Start here",
-      type: "html",
-      html: overviewHtml,
+      id: "itinerary",
+      title: "Itinerary",
+      countLabel: `${pkg.itinerary.length} days`,
+      type: "itinerary",
+      days: pkg.itinerary,
     })
   }
 
-  for (const [index, section] of pkg.contentSections.entries()) {
-    if (!section.title || section.lines.length === 0) continue
+  // We skip inclusions because it is displayed upfront in the detail page now
+
+  if (pkg.exclusions && pkg.exclusions.length > 0) {
     sections.push({
-      id: uniqueSectionId(sectionId(section, index)),
-      title: section.title,
-      countLabel: `${section.lines.length} ${section.lines.length === 1 ? "point" : "points"}`,
+      id: "exclusions",
+      title: "What's Not Included",
+      countLabel: `${pkg.exclusions.length} points`,
       type: "lines",
-      lines: section.lines,
+      lines: pkg.exclusions,
+      icon: "cross"
     })
   }
 
-  if (pkg.faqs.length > 0) {
+  if (pkg.mustKnow && pkg.mustKnow.length > 0) {
     sections.push({
-      id: uniqueSectionId("faqs"),
+      id: "must-know",
+      title: "Good to Know",
+      countLabel: `${pkg.mustKnow.length} notes`,
+      type: "lines",
+      lines: pkg.mustKnow,
+      icon: "info"
+    })
+  }
+
+  if (pkg.faqs && pkg.faqs.length > 0) {
+    sections.push({
+      id: "faqs",
       title: "FAQs",
       countLabel: `${pkg.faqs.length} answers`,
       type: "faqs",
@@ -83,10 +76,29 @@ function buildSections(pkg: PublicPackage, overviewHtml?: string): AccordionSect
     })
   }
 
+  // Fallback for old content sections if they still exist for backward compatibility
+  // Only add if they are not the standard ones we just handled
+  if (pkg.contentSections && pkg.contentSections.length > 0) {
+    const handledTitles = ["inclusions", "exclusions", "must know", "good to know", "itinerary", "faqs", "highlights"]
+    for (const [index, section] of pkg.contentSections.entries()) {
+      if (!section.title || section.lines.length === 0) continue
+      if (handledTitles.includes(section.title.toLowerCase())) continue
+      
+      sections.push({
+        id: section.id || `legacy-section-${index}`,
+        title: section.title,
+        countLabel: `${section.lines.length} points`,
+        type: "lines",
+        lines: section.lines,
+        icon: "check"
+      })
+    }
+  }
+
   return sections
 }
 
-function LinesContent({ lines }: { lines: string[] }) {
+function LinesContent({ lines, icon = "check" }: { lines: string[], icon?: "check" | "cross" | "info" }) {
   return (
     <ul className="grid gap-3">
       {lines.map((line, index) => (
@@ -94,11 +106,40 @@ function LinesContent({ lines }: { lines: string[] }) {
           key={`${line}-${index}`}
           className="flex gap-3 rounded-lg bg-secondary/45 px-4 py-3 text-sm leading-relaxed text-foreground/80"
         >
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          {icon === "check" ? (
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          ) : icon === "cross" ? (
+            <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+          ) : (
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          )}
           <span className="min-w-0">{line}</span>
         </li>
       ))}
     </ul>
+  )
+}
+
+function ItineraryContent({ days }: { days: ItineraryDay[] }) {
+  return (
+    <div className="relative space-y-6 before:absolute before:inset-y-2 before:left-[11px] before:w-px before:bg-border">
+      {days.map((day) => (
+        <article key={`day-${day.day}`} className="relative pl-8">
+          <span className="absolute left-0 top-1.5 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-background ring-4 ring-card">
+            <span className="h-2 w-2 rounded-full bg-primary" />
+          </span>
+          <h3 className="font-semibold leading-relaxed">
+            <span className="text-primary mr-2">Day {day.day}</span>
+            {day.title}
+          </h3>
+          {day.description ? (
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              {day.description}
+            </p>
+          ) : null}
+        </article>
+      ))}
+    </div>
   )
 }
 
@@ -122,12 +163,10 @@ function FaqContent({ faqs }: { faqs: FaqItem[] }) {
 
 export function PackageInfoAccordion({
   pkg,
-  overviewHtml,
 }: {
   pkg: PublicPackage
-  overviewHtml?: string
 }) {
-  const sections = useMemo(() => buildSections(pkg, overviewHtml), [pkg, overviewHtml])
+  const sections = useMemo(() => buildSections(pkg), [pkg])
   const [openId, setOpenId] = useState(sections[0]?.id || "")
 
   if (sections.length === 0) return null
@@ -136,11 +175,8 @@ export function PackageInfoAccordion({
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+          <h2 className="font-heading text-3xl font-semibold">
             Trip Details
-          </p>
-          <h2 className="mt-2 font-heading text-4xl font-semibold">
-            Everything, Neatly Organized
           </h2>
         </div>
         {pkg.itineraryUrl ? (
@@ -156,7 +192,7 @@ export function PackageInfoAccordion({
         ) : null}
       </div>
 
-      <div className="mt-7 min-w-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="mt-6 min-w-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         {sections.map((section, index) => {
           const isOpen = openId === section.id
 
@@ -168,11 +204,11 @@ export function PackageInfoAccordion({
               <button
                 type="button"
                 aria-expanded={isOpen}
-                onClick={() => setOpenId(section.id)}
+                onClick={() => setOpenId(isOpen ? "" : section.id)}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-secondary/45"
               >
                 <span className="min-w-0">
-                  <span className="font-heading text-2xl font-semibold">
+                  <span className="font-heading text-xl font-semibold">
                     {section.title}
                   </span>
                   <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -195,15 +231,12 @@ export function PackageInfoAccordion({
                     transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="min-w-0 px-5 pb-5">
-                      {section.type === "html" ? (
-                        <div
-                          className="max-w-none overflow-x-auto leading-relaxed text-muted-foreground [&_a]:font-semibold [&_a]:text-primary [&_a]:underline [&_h1]:mb-3 [&_h1]:mt-6 [&_h1]:font-heading [&_h1]:text-3xl [&_h1]:font-semibold [&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:font-heading [&_h2]:text-2xl [&_h2]:font-semibold [&_h3]:mb-2 [&_h3]:mt-5 [&_h3]:font-heading [&_h3]:text-xl [&_h3]:font-semibold [&_li]:ml-5 [&_ol]:my-4 [&_ol]:list-decimal [&_p]:my-3 [&_strong]:font-semibold [&_table]:w-full [&_table]:min-w-[36rem] [&_ul]:my-4 [&_ul]:list-disc"
-                          dangerouslySetInnerHTML={{ __html: section.html }}
-                        />
-                      ) : null}
+                    <div className="min-w-0 px-5 pb-5 pt-2">
                       {section.type === "lines" ? (
-                        <LinesContent lines={section.lines} />
+                        <LinesContent lines={section.lines} icon={section.icon} />
+                      ) : null}
+                      {section.type === "itinerary" ? (
+                        <ItineraryContent days={section.days} />
                       ) : null}
                       {section.type === "faqs" ? (
                         <FaqContent faqs={section.faqs} />
