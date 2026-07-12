@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays } from "lucide-react"
+import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, BookOpenText } from "lucide-react"
 import { Reveal } from "./reveal"
 import type { PublicBlog } from "@/lib/cms/types"
 import { fallbackBlogs } from "@/lib/cms/fallback-data"
@@ -27,7 +27,7 @@ export function Blogs({ blogs = fallbackBlogs }: { blogs?: PublicBlog[] }) {
               Travel Journal
             </span>
             <h2 className="mt-3 font-heading text-4xl font-semibold leading-tight text-balance sm:text-5xl lg:text-6xl">
-              Stories & Travel Inspiration
+              Stories &amp; Travel Inspiration
             </h2>
             <p className="mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
               Tips, guides, and inspiration to help you plan an unforgettable
@@ -35,7 +35,7 @@ export function Blogs({ blogs = fallbackBlogs }: { blogs?: PublicBlog[] }) {
             </p>
           </Reveal>
 
-          <div className="hidden gap-3 md:flex">
+          <div className="flex gap-3">
             <button
               type="button"
               aria-label="Previous blogs"
@@ -54,58 +54,66 @@ export function Blogs({ blogs = fallbackBlogs }: { blogs?: PublicBlog[] }) {
             </button>
           </div>
         </div>
-      </div>
 
-      <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div
-          ref={scrollerRef}
-          className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 sm:gap-6"
-        >
-          {blogs.map((blog, i) => (
-            <article
-              key={`${blog.id || blog.slug || blog.title}-${i}`}
-              className="group flex w-[min(84vw,20rem)] shrink-0 snap-start flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl sm:w-80 lg:w-[21.25rem]"
+        <div className="mt-12">
+          {blogs.length > 0 ? (
+            <div
+              ref={scrollerRef}
+              className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 sm:gap-6"
             >
-              <div className="relative h-48 overflow-hidden">
-                <Image
-                  src={blog.coverImage.url || "/placeholder.svg"}
-                  alt={blog.coverImage.alt}
-                  fill
-                  sizes="(min-width: 1024px) 340px, 300px"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
-                  {blog.category || "Kashmir Guide"}
-                </span>
-              </div>
-
-              <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  {blog.publishedAt
-                    ? new Date(blog.publishedAt).toLocaleDateString("en-IN", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                      })
-                    : "Travel Guide"}
-                </span>
-                <h3 className="mt-3 font-heading text-2xl font-semibold leading-snug break-words transition-colors group-hover:text-primary">
-                  {blog.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground break-words">
-                  {blog.excerpt}
-                </p>
-                <Link
-                  href={`/blogs/${blog.slug}`}
-                  className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary"
+              {blogs.map((blog, i) => (
+                <article
+                  key={`${blog.id || blog.slug || blog.title}-${i}`}
+                  className="group flex w-[min(84vw,20rem)] shrink-0 snap-start flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl sm:w-80 lg:w-[21.25rem]"
                 >
-                  Read More
-                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </Link>
-              </div>
-            </article>
-          ))}
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={blog.coverImage.url || "/placeholder.svg"}
+                      alt={blog.coverImage.alt}
+                      fill
+                      sizes="(min-width: 1024px) 340px, 300px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
+                      {blog.category || "Kashmir Guide"}
+                    </span>
+                  </div>
+
+                  <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                      <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                      {blog.publishedAt
+                        ? new Date(blog.publishedAt).toLocaleDateString("en-IN", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          })
+                        : "Travel Guide"}
+                    </span>
+                    <h3 className="mt-3 line-clamp-2 font-heading text-2xl font-semibold leading-snug transition-colors group-hover:text-primary">
+                      {blog.title}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      {blog.excerpt}
+                    </p>
+                    <Link
+                      href={`/blogs/${blog.slug}`}
+                      className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-primary"
+                    >
+                      Read More
+                      <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-muted/30 py-20 text-center">
+              <BookOpenText className="mb-4 h-12 w-12 text-muted-foreground/50" />
+              <h3 className="text-lg font-semibold">No stories yet</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Check back soon for new travel guides.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>

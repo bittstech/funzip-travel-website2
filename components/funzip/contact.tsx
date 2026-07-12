@@ -51,35 +51,35 @@ export function Contact({
                 </div>
 
                 <ul className="flex flex-col gap-4">
-                  <li className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <li className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Phone className="h-5 w-5" />
                     </span>
-                    <span className="min-w-0 text-sm font-medium text-foreground">
+                    <span className="min-w-0 break-words pt-2.5 text-sm font-medium text-foreground">
                       {phone}
                     </span>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <li className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <MessageCircle className="h-5 w-5" />
                     </span>
-                    <span className="min-w-0 text-sm font-medium text-foreground">
+                    <span className="min-w-0 break-words pt-2.5 text-sm font-medium text-foreground">
                       WhatsApp: +{whatsapp}
                     </span>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <li className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Mail className="h-5 w-5" />
                     </span>
-                    <span className="min-w-0 text-sm font-medium text-foreground">
+                    <span className="min-w-0 break-words pt-2.5 text-sm font-medium text-foreground">
                       {settings.email || "hello@funzip.travel"}
                     </span>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <li className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <MapPin className="h-5 w-5" />
                     </span>
-                    <span className="min-w-0 text-sm font-medium text-foreground">
+                    <span className="min-w-0 break-words pt-2.5 text-sm font-medium text-foreground">
                       {settings.address || "Kashmir, India"}
                     </span>
                   </li>

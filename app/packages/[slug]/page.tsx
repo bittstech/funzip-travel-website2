@@ -95,7 +95,7 @@ export default async function PackageDetailPage({
           <h1 className="mt-5 max-w-4xl font-heading text-4xl font-semibold leading-tight sm:text-6xl">
             {pkg.title}
           </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90">
+          <p className="mt-5 max-w-2xl break-words text-lg leading-relaxed text-white/90">
             {pkg.shortDescription}
           </p>
           <div className="mt-8 flex flex-wrap gap-3 text-sm font-semibold">
@@ -159,7 +159,7 @@ export default async function PackageDetailPage({
 
           </div>
 
-          <aside className="h-fit min-w-0 rounded-xl border border-border bg-card p-5 lg:sticky lg:top-24">
+          <aside className="h-fit min-w-0 overflow-y-auto rounded-xl border border-border bg-card p-5 lg:sticky lg:top-24 lg:max-h-[80svh]">
             <h2 className="font-heading text-2xl font-semibold">
               Book This Trip
             </h2>

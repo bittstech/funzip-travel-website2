@@ -87,10 +87,11 @@ export function Footer({
             <h3 className="font-heading text-lg font-semibold">Packages</h3>
             <ul className="mt-4 flex flex-col gap-2.5">
               {packages.slice(0, 6).map((pkg, packageIndex) => (
-                <li key={`${pkg.id || pkg.slug}-${packageIndex}`}>
+                <li key={`${pkg.id || pkg.slug}-${packageIndex}`} className="min-w-0">
                   <a
                     href={`/packages/${pkg.slug}`}
-                    className="text-sm text-background/70 transition-colors hover:text-primary"
+                    className="block truncate text-sm text-background/70 transition-colors hover:text-primary"
+                    title={pkg.title}
                   >
                     {pkg.title}
                   </a>
@@ -102,17 +103,17 @@ export function Footer({
           <div>
             <h3 className="font-heading text-lg font-semibold">Get in Touch</h3>
             <ul className="mt-4 flex flex-col gap-3">
-              <li className="flex items-center gap-2.5 text-sm text-background/70">
-                <Phone className="h-4 w-4 text-primary" />
-                {settings.phonePrimary || "+91 00000 00000"}
+              <li className="flex items-start gap-2.5 text-sm text-background/70">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span className="min-w-0 break-words">{settings.phonePrimary || "+91 00000 00000"}</span>
               </li>
-              <li className="flex items-center gap-2.5 text-sm text-background/70">
-                <Mail className="h-4 w-4 text-primary" />
-                {settings.email || "hello@funzip.travel"}
+              <li className="flex items-start gap-2.5 text-sm text-background/70">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span className="min-w-0 break-words">{settings.email || "hello@funzip.travel"}</span>
               </li>
-              <li className="flex items-center gap-2.5 text-sm text-background/70">
-                <MapPin className="h-4 w-4 text-primary" />
-                {settings.address || "Kashmir, India"}
+              <li className="flex items-start gap-2.5 text-sm text-background/70">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span className="min-w-0 break-words">{settings.address || "Kashmir, India"}</span>
               </li>
             </ul>
           </div>

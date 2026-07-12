@@ -76,7 +76,7 @@ export default async function BlogDetailPage({
       />
       <Navbar />
       <article>
-        <header className="relative isolate min-h-[65svh] overflow-hidden bg-black px-5 pb-16 pt-36 text-white lg:px-8">
+        <header className="relative isolate min-h-[65svh] overflow-hidden bg-black px-4 pb-16 pt-36 text-white sm:px-6 lg:px-8">
           <Image
             src={blog.coverImage.url}
             alt={blog.coverImage.alt}
@@ -105,9 +105,9 @@ export default async function BlogDetailPage({
           </div>
         </header>
 
-        <div className="mx-auto max-w-3xl px-5 py-16 lg:px-8">
+        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
           <div
-            className="prose prose-neutral max-w-none prose-headings:font-heading prose-a:text-primary"
+            className="prose prose-neutral max-w-none break-words prose-headings:font-heading prose-a:text-primary"
             dangerouslySetInnerHTML={{ __html: markdownToHtml(blog.content || blog.excerpt) }}
           />
 

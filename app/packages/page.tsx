@@ -74,42 +74,49 @@ export default async function PackagesPage() {
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {packages.map((pkg) => (
-            <article
-              key={pkg.id}
-              className="group min-w-0 overflow-hidden rounded-xl border border-border bg-card"
-            >
-              <div className="relative h-56 overflow-hidden">
-                <Image
-                  src={pkg.coverImage.url}
-                  alt={pkg.coverImage.alt}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-              <div className="min-w-0 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                  {pkg.duration || pkg.location || "Kashmir"}
-                </p>
-                <h2 className="mt-2 font-heading text-2xl font-semibold leading-tight">
-                  {pkg.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {pkg.shortDescription}
-                </p>
-                <div className="mt-5 flex flex-col gap-4 min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between">
-                  <span className="text-sm font-semibold">{pkg.priceLabel}</span>
-                  <Link
-                    href={`/packages/${pkg.slug}`}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-                  >
-                    View Details
-                  </Link>
+          {packages.length === 0 ? (
+            <div className="col-span-full flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 text-center">
+              <p className="text-lg font-semibold text-muted-foreground">No packages published yet.</p>
+              <p className="mt-2 text-sm text-muted-foreground">Check back soon — we&apos;re crafting new Kashmir journeys.</p>
+            </div>
+          ) : (
+            packages.map((pkg) => (
+              <article
+                key={pkg.id}
+                className="group min-w-0 overflow-hidden rounded-xl border border-border bg-card"
+              >
+                <div className="relative h-56 overflow-hidden">
+                  <Image
+                    src={pkg.coverImage.url}
+                    alt={pkg.coverImage.alt}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 </div>
-              </div>
-            </article>
-          ))}
+                <div className="min-w-0 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                    {pkg.duration || pkg.location || "Kashmir"}
+                  </p>
+                  <h2 className="mt-2 line-clamp-2 font-heading text-2xl font-semibold leading-tight">
+                    {pkg.title}
+                  </h2>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                    {pkg.shortDescription}
+                  </p>
+                  <div className="mt-5 flex flex-col gap-4 min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between">
+                    <span className="text-sm font-semibold">{pkg.priceLabel}</span>
+                    <Link
+                      href={`/packages/${pkg.slug}`}
+                      className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
         </div>
       </section>
 

@@ -38,13 +38,15 @@ export default async function ContactPage() {
         ]}
       />
       <Navbar />
-      <section className="bg-secondary/40 px-5 pb-10 pt-32 text-center lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-          Contact
-        </p>
-        <h1 className="mt-3 font-heading text-5xl font-semibold">
-          Plan Your Kashmir Trip
-        </h1>
+      <section className="bg-secondary/40 px-4 pb-10 pt-32 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+            Contact
+          </p>
+          <h1 className="mt-3 font-heading text-4xl font-semibold sm:text-5xl">
+            Plan Your Kashmir Trip
+          </h1>
+        </div>
       </section>
       <Contact settings={settings} sourcePage="/contact" />
       <Footer settings={settings} packages={packages} />

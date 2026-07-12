@@ -12,7 +12,7 @@ export function Faqs() {
   return (
     <section id="faqs" className="relative bg-secondary/40 py-20 lg:py-28">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:px-8">
-        <Reveal className="lg:sticky lg:top-28 lg:self-start">
+        <Reveal className="min-w-0 lg:sticky lg:top-28 lg:self-start">
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
             Good To Know
           </span>
