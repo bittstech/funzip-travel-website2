@@ -1,209 +1,184 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import Image from "next/image"
-import { AnimatePresence, motion, useScroll, useTransform } from "motion/react"
-import { MapPin, Route, Hotel, MessageCircle } from "lucide-react"
-import type { PublicHeroSlide } from "@/lib/cms/types"
-import { fallbackHeroSlides } from "@/lib/cms/fallback-data"
+import {
+  ArrowRight,
+  MessageCircle,
+  MapPin,
+  BadgeIndianRupee,
+  Route,
+  Headset,
+} from "lucide-react"
+import { gsap, useGSAP } from "./gsap"
+import type { SiteSettingsPublic } from "@/lib/cms/types"
+import { fallbackSettings } from "@/lib/cms/fallback-data"
+
+const headlineLines = ["Kashmir, shown by", "the people born here."]
 
 const trustItems = [
-  { icon: MapPin, label: "Local Travel Experts" },
-  { icon: Route, label: "Custom Itineraries" },
-  { icon: Hotel, label: "Hotel + Transport + Sightseeing" },
-  { icon: MessageCircle, label: "Quick WhatsApp Support" },
+  { icon: MapPin, label: "100% Native Kashmiri Team" },
+  { icon: BadgeIndianRupee, label: "Best Direct Local Prices" },
+  { icon: Route, label: "Custom Trips, Your Pace" },
+  { icon: Headset, label: "24/7 On-Trip Support" },
 ]
 
-export function Hero({ slides = fallbackHeroSlides }: { slides?: PublicHeroSlide[] }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const heroSlides = slides.length > 0 ? slides : fallbackHeroSlides
-  const [activeIndex, setActiveIndex] = useState(0)
-  const slide = heroSlides[activeIndex] || heroSlides[0]
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  })
+export function Hero({
+  settings = fallbackSettings,
+}: {
+  settings?: SiteSettingsPublic
+}) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const whatsapp = settings.whatsappNumber || "910000000000"
 
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"])
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"])
-  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Ken Burns settle on the background
+        gsap.fromTo(
+          ".hero-img",
+          { scale: 1.12 },
+          { scale: 1, duration: 3.2, ease: "power2.out" },
+        )
 
-  useEffect(() => {
-    if (activeIndex <= heroSlides.length - 1) return
-    setActiveIndex(0)
-  }, [activeIndex, heroSlides.length])
+        gsap
+          .timeline({ defaults: { ease: "power3.out" } })
+          .from(".hero-eyebrow", { y: 20, opacity: 0, duration: 0.7, delay: 0.3 })
+          .from(
+            ".hero-line",
+            { yPercent: 110, duration: 1, stagger: 0.14, ease: "power4.out" },
+            "-=0.35",
+          )
+          .from(".hero-sub", { y: 24, opacity: 0, duration: 0.8 }, "-=0.5")
+          .from(
+            ".hero-cta",
+            { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 },
+            "-=0.45",
+          )
+          .from(".hero-note", { opacity: 0, duration: 0.6 }, "-=0.2")
+          .from(
+            ".hero-trust-item",
+            { y: 18, opacity: 0, duration: 0.55, stagger: 0.08 },
+            "-=0.4",
+          )
 
-  useEffect(() => {
-    if (heroSlides.length <= 1) return
-
-    const timer = window.setInterval(() => {
-      setActiveIndex((index) => (index + 1) % heroSlides.length)
-    }, 6500)
-
-    return () => window.clearInterval(timer)
-  }, [heroSlides.length])
+        // Gentle parallax on scroll
+        gsap.to(".hero-img", {
+          yPercent: 12,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        })
+        gsap.to(".hero-copy", {
+          yPercent: 18,
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "85% top",
+            scrub: true,
+          },
+        })
+      })
+    },
+    { scope: sectionRef },
+  )
 
   return (
     <section
-      ref={ref}
+      ref={sectionRef}
       id="home"
       className="relative isolate min-h-[100svh] overflow-hidden bg-black"
     >
-      {/* Parallax background */}
-      <motion.div
-        style={{ y: bgY, scale: bgScale }}
-        className="absolute inset-0 z-0"
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={slide.id || slide.image.url}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={slide.image.url}
-              alt={slide.image.alt}
-              fill
-              priority={activeIndex === 0}
-              sizes="100vw"
-              className={`object-cover ${slide.mobileImage ? "hidden sm:block" : ""}`}
-            />
-            {slide.mobileImage ? (
-              <Image
-                src={slide.mobileImage.url}
-                alt={slide.mobileImage.alt}
-                fill
-                priority={activeIndex === 0}
-                sizes="100vw"
-                className="object-cover sm:hidden"
-              />
-            ) : null}
-          </motion.div>
-        </AnimatePresence>
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/55 via-black/45 to-black/80" />
-      </motion.div>
-
-      {/* Floating clouds */}
-      <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
-        <div className="animate-float-cloud absolute left-[8%] top-[18%] h-24 w-56 rounded-full bg-white/20 blur-3xl" />
-        <div className="animate-float-cloud absolute right-[12%] top-[30%] h-20 w-72 rounded-full bg-white/15 blur-3xl [animation-delay:3s]" />
-        <div className="animate-float-cloud absolute left-[30%] top-[10%] h-16 w-48 rounded-full bg-white/10 blur-3xl [animation-delay:6s]" />
+      {/* Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="hero-img absolute inset-0">
+          <Image
+            src="/naweedey-XHG0uFAlEGM-unsplash.jpg"
+            alt="Golden-hour view of a Kashmir valley with snow-capped mountains and Dal Lake"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/15" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
       </div>
 
-      <motion.div
-        style={{ y: textY, opacity: fade }}
-        className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center justify-center px-4 py-28 text-center sm:px-6 sm:py-32 lg:px-8"
-      >
-        {/* <motion.span
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-white backdrop-blur-md"
-        >
-          Kashmir Tour Specialists
-        </motion.span> */}
+      {/* Content — one left axis, vertically centered */}
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-4 pb-44 pt-32 sm:px-6 sm:pb-40 lg:px-8">
+        <div className="hero-copy max-w-3xl">
+          <p className="hero-eyebrow flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-primary sm:text-sm">
+            <span className="h-px w-10 bg-primary" aria-hidden />
+            Funzip · Native Kashmiri Hosts
+          </p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="font-heading text-4xl font-semibold leading-[1.05] text-balance text-white drop-shadow-lg sm:text-6xl md:text-7xl lg:text-8xl"
-        >
-          {slide.title}
-        </motion.h1>
+          <h1 className="mt-6 font-heading text-5xl font-semibold leading-[1.04] text-white drop-shadow-lg sm:text-6xl md:text-7xl lg:text-8xl">
+            {headlineLines.map((line) => (
+              <span key={line} className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
+                <span className="hero-line block will-change-transform">
+                  {line}
+                </span>
+              </span>
+            ))}
+          </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.55 }}
-          className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/90 sm:text-lg md:text-xl"
-        >
-          {slide.subtitle ||
-            "Handcrafted Kashmir tour packages for families, couples, honeymooners, and adventure travelers."}
-        </motion.p>
+          <p className="hero-sub mt-6 max-w-xl text-pretty text-base leading-relaxed text-white/85 sm:text-lg">
+            Custom trips for every kind of traveler — planned by native
+            experts, priced direct from the source, and hosted with the warmth
+            of a Kashmiri home.
+          </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.7 }}
-          className="mt-9 flex flex-col items-center gap-4 sm:flex-row"
-        >
-          <a
-            href={slide.ctaUrl || "/packages"}
-            className="inline-flex w-full items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105 sm:w-auto"
-          >
-            {slide.ctaText || "Explore Packages"}
-          </a>
-          <a
-            href="/contact"
-            className="inline-flex w-full items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20 sm:w-auto"
-          >
-            Plan My Kashmir Trip
-          </a>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.9 }}
-          className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:mt-12 sm:grid-cols-4"
-        >
-          {trustItems.map((item, itemIndex) => (
-            <div
-              key={`${item.label}-${itemIndex}`}
-              className="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-4 text-center backdrop-blur-md"
+          <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <a
+              href="#contact"
+              className="hero-cta group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105"
             >
-              <item.icon className="h-5 w-5 text-primary-foreground" />
-              <span className="text-xs font-medium leading-tight text-white/90">
+              Get My Free Itinerary
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </a>
+            <a
+              href={`https://wa.me/${whatsapp}?text=${encodeURIComponent("Hi Funzip! I'm planning a Kashmir trip — can you help me build a custom itinerary?")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero-cta inline-flex items-center justify-center gap-2 rounded-full border border-white/35 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Chat With a Local
+            </a>
+          </div>
+
+          <p className="hero-note mt-5 text-xs text-white/60 sm:text-sm">
+            Free plan &amp; quote within hours · No advance needed
+          </p>
+        </div>
+      </div>
+
+      {/* Trust strip pinned to the bottom, same container axis */}
+      <div className="absolute inset-x-0 bottom-0 z-10 border-t border-white/15 bg-black/30 backdrop-blur-md">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-4 px-4 py-5 sm:px-6 lg:grid-cols-4 lg:gap-x-10 lg:px-8">
+          {trustItems.map((item) => (
+            <div
+              key={item.label}
+              className="hero-trust-item flex items-center gap-3"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                <item.icon className="h-4 w-4" />
+              </span>
+              <span className="text-xs font-medium leading-snug text-white/85 sm:text-sm">
                 {item.label}
               </span>
             </div>
           ))}
-        </motion.div>
-
-        {heroSlides.length > 1 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1 }}
-            className="mt-8 flex items-center justify-center gap-2"
-            aria-label="Hero slides"
-          >
-            {heroSlides.map((item, index) => (
-              <button
-                key={item.id || item.image.url}
-                type="button"
-                onClick={() => setActiveIndex(index)}
-                aria-label={`Show hero slide ${index + 1}`}
-                aria-current={index === activeIndex}
-                className={`h-2.5 rounded-full transition-all ${
-                  index === activeIndex
-                    ? "w-8 bg-white"
-                    : "w-2.5 bg-white/45 hover:bg-white/75"
-                }`}
-              />
-            ))}
-          </motion.div>
-        ) : null}
-      </motion.div>
-
-      {/* Scroll cue */}
-      <motion.div
-        style={{ opacity: fade }}
-        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2"
-      >
-        <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-white/50 p-1.5">
-          <motion.span
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity }}
-            className="h-1.5 w-1.5 rounded-full bg-white"
-          />
         </div>
-      </motion.div>
+      </div>
     </section>
   )
 }

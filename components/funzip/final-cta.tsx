@@ -29,15 +29,15 @@ export function FinalCta() {
       <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-24 text-center sm:px-6 lg:px-8 lg:py-36">
         <Reveal>
           <h2 className="font-heading text-4xl font-semibold leading-[1.1] text-balance text-white drop-shadow-lg sm:text-5xl lg:text-6xl">
-            Kashmir is calling. Let Funzip plan it perfectly.
+            Come to Kashmir as a traveler. Leave as family.
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
           <a
-            href="/contact"
+            href="#contact"
             className="mt-9 inline-flex items-center justify-center rounded-full bg-primary px-9 py-4 text-base font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105"
           >
-            Start Planning Now
+            Get My Free Custom Itinerary
           </a>
         </Reveal>
       </div>

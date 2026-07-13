@@ -1,6 +1,10 @@
 import { Navbar } from "@/components/funzip/navbar"
 import { Hero } from "@/components/funzip/hero"
+import { Story } from "@/components/funzip/story"
+import { TravelerTypes } from "@/components/funzip/traveler-types"
 import { Packages } from "@/components/funzip/packages"
+import { HowItWorks } from "@/components/funzip/how-it-works"
+import { Testimonials } from "@/components/funzip/testimonials"
 import { Gallery } from "@/components/funzip/gallery"
 import { Blogs } from "@/components/funzip/blogs"
 import { Faqs } from "@/components/funzip/faqs"
@@ -11,7 +15,6 @@ import { FloatingActions } from "@/components/funzip/floating-actions"
 import {
   getFeaturedPackages,
   getGalleryImages,
-  getHeroSlides,
   getLatestBlogs,
   getSiteSettings,
 } from "@/lib/cms/queries"
@@ -30,10 +33,10 @@ export async function generateMetadata() {
   return buildMetadata({
     title:
       settings.defaultMetaTitle ||
-      "Funzip Kashmir Tour & Travels | Premium Kashmir Packages",
+      "Funzip Kashmir Tour & Travels | Custom Packages by Native Experts",
     description:
       settings.defaultMetaDescription ||
-      "Discover Kashmir with Funzip. Handcrafted tour packages for families, couples, honeymooners, and adventure travelers.",
+      "Custom Kashmir trips crafted by native Kashmiri experts at direct local prices. Honeymoon, family, adventure & offbeat packages — hosted as guests, not customers.",
     path: "/",
     image: settings.defaultOgImage,
     settings,
@@ -41,14 +44,12 @@ export async function generateMetadata() {
 }
 
 export default async function Page() {
-  const [settings, heroSlides, packages, galleryImages, blogs] =
-    await Promise.all([
-      getSiteSettings(),
-      getHeroSlides(),
-      getFeaturedPackages(6),
-      getGalleryImages(8),
-      getLatestBlogs(6),
-    ])
+  const [settings, packages, galleryImages, blogs] = await Promise.all([
+    getSiteSettings(),
+    getFeaturedPackages(6),
+    getGalleryImages(8),
+    getLatestBlogs(6),
+  ])
 
   return (
     <main className="relative">
@@ -60,8 +61,12 @@ export default async function Page() {
         ]}
       />
       <Navbar />
-      <Hero slides={heroSlides} />
+      <Hero settings={settings} />
+      <Story />
+      <TravelerTypes />
       <Packages packages={packages} />
+      <HowItWorks />
+      <Testimonials />
       <Gallery images={galleryImages} />
       <Blogs blogs={blogs} />
       <Faqs />
