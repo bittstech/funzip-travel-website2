@@ -136,10 +136,10 @@ export function Hero({
             of a Kashmiri home.
           </p>
 
-          <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
             <a
               href="#contact"
-              className="hero-cta group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105"
+              className="hero-cta group inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105 sm:w-auto"
             >
               Get My Free Itinerary
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -148,7 +148,7 @@ export function Hero({
               href={`https://wa.me/${whatsapp}?text=${encodeURIComponent("Hi Funzip! I'm planning a Kashmir trip — can you help me build a custom itinerary?")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hero-cta inline-flex items-center justify-center gap-2 rounded-full border border-white/35 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20"
+              className="hero-cta inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/35 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20 sm:w-auto"
             >
               <MessageCircle className="h-4 w-4" />
               Chat With a Local
