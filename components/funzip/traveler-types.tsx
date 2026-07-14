@@ -189,15 +189,6 @@ export function TravelerTypes() {
         ))}
       </div>
 
-      <p className="mt-10 text-center text-sm text-muted-foreground">
-        Solo traveler? Group of 20? Something else entirely?{" "}
-        <a
-          href="#contact"
-          className="font-semibold text-primary underline-offset-4 hover:underline"
-        >
-          We&apos;ll build it for you too →
-        </a>
-      </p>
     </section>
   )
 }
