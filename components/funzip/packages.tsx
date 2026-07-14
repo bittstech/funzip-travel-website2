@@ -167,9 +167,6 @@ export function Packages({
               >
                 {packages.map((pkg, i) => {
                   const images = [pkg.coverImage, ...pkg.galleryImages].slice(0, 5)
-                  const chips = (
-                    pkg.highlights.length ? pkg.highlights : pkg.inclusions
-                  ).slice(0, 2)
 
                   return (
                     <article
@@ -192,12 +189,6 @@ export function Packages({
                           {pkg.title}
                         </h3>
                       </Link>
-
-                      {chips.length ? (
-                        <p className="mt-2 line-clamp-1 rounded-md bg-primary/10 px-2.5 py-1.5 text-xs text-foreground/75">
-                          {chips.join(" • ")}
-                        </p>
-                      ) : null}
 
                       <p className="mt-3 text-[11px] uppercase tracking-wide text-muted-foreground">
                         Starting from
