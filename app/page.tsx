@@ -64,7 +64,7 @@ export default async function Page() {
       <Hero settings={settings} />
       <Story />
       <TravelerTypes />
-      <Packages packages={packages} />
+      <Packages packages={packages} settings={settings} />
       <HowItWorks />
       <Testimonials />
       <Gallery images={galleryImages} />
