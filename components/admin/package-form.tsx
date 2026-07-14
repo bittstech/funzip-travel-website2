@@ -1,6 +1,7 @@
 "use client"
 
 import { type FormEvent, useActionState, useState } from "react"
+import { AiImport } from "./ai-import"
 import { ImageUploadInput } from "./image-upload-input"
 import { PromptTemplatePanel } from "./prompt-template-panel"
 import { RichTextEditor } from "./rich-text-editor"
@@ -690,10 +691,26 @@ export function PackageForm({
           </div>
         </details>
 
-        {/* AI Prompt */}
+        {/* AI writer: copy prompt out, paste result back, auto-fill */}
+        <AiImport
+          mappings={[
+            { label: "TITLE", field: "title" },
+            { label: "SLUG", field: "slug" },
+            { label: "SHORT DESCRIPTION", field: "shortDescription" },
+            { label: "FULL DESCRIPTION", field: "fullDescription" },
+            { label: "INCLUSIONS", field: "inclusions" },
+            { label: "EXCLUSIONS", field: "exclusions" },
+            { label: "ITINERARY", field: "itinerary" },
+            { label: "FAQS", field: "faqs" },
+            { label: "GOOD TO KNOW", field: "mustKnow" },
+            { label: "META TITLE", field: "metaTitle" },
+            { label: "META DESCRIPTION", field: "metaDescription" },
+            { label: "KEYWORDS", field: "keywords" },
+          ]}
+        />
         <PromptTemplatePanel
           title="AI Package Writer"
-          description="Fill the 5 brackets, copy this into ChatGPT or Gemini, then paste the result into the matching fields above."
+          description="Fill the 5 brackets, copy this into ChatGPT or Gemini, then paste the whole answer into the Auto-Fill box above."
           prompt={packagePromptTemplate}
         />
 

@@ -29,10 +29,13 @@ type AccordionSection =
       faqs: FaqItem[]
     }
 
-function buildSections(pkg: PublicPackage): AccordionSection[] {
+function buildSections(
+  pkg: PublicPackage,
+  exclude: string[] = [],
+): AccordionSection[] {
   const sections: AccordionSection[] = []
 
-  if (pkg.itinerary && pkg.itinerary.length > 0) {
+  if (!exclude.includes("itinerary") && pkg.itinerary && pkg.itinerary.length > 0) {
     sections.push({
       id: "itinerary",
       title: "Itinerary",
@@ -66,7 +69,7 @@ function buildSections(pkg: PublicPackage): AccordionSection[] {
     })
   }
 
-  if (pkg.faqs && pkg.faqs.length > 0) {
+  if (!exclude.includes("faqs") && pkg.faqs && pkg.faqs.length > 0) {
     sections.push({
       id: "faqs",
       title: "FAQs",
@@ -163,10 +166,12 @@ function FaqContent({ faqs }: { faqs: FaqItem[] }) {
 
 export function PackageInfoAccordion({
   pkg,
+  exclude = [],
 }: {
   pkg: PublicPackage
+  exclude?: string[]
 }) {
-  const sections = useMemo(() => buildSections(pkg), [pkg])
+  const sections = useMemo(() => buildSections(pkg, exclude), [pkg, exclude])
   const [openId, setOpenId] = useState(sections[0]?.id || "")
 
   if (sections.length === 0) return null

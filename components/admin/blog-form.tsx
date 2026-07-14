@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
+import { AiImport } from "./ai-import"
 import { ImageUploadInput } from "./image-upload-input"
 import { PromptTemplatePanel } from "./prompt-template-panel"
 import { RichTextEditor } from "./rich-text-editor"
@@ -21,16 +22,24 @@ Create a helpful, user-attractive, SEO-friendly blog for:
 - Secondary keywords: [keyword 1, keyword 2, keyword 3]
 - Suggested internal links: /packages, /contact, [relevant package URL]
 
-Return only these sections:
-1. Blog title under 60 characters
-2. URL slug
-3. Excerpt under 155 characters
-4. Full blog content in Markdown with H2/H3 headings, short paragraphs, and practical tips
-5. Meta title under 60 characters
-6. Meta description under 155 characters
-7. Tags as comma-separated keywords
-8. 4 FAQs in this format: Question | Answer
-9. Cover image alt text
+Return the answer EXACTLY in this format (keep the labels):
+
+TITLE: (under 60 characters)
+SLUG: (url-safe)
+EXCERPT: (1 sentence, under 155 characters)
+CATEGORY: (one of: Itineraries, Season Guide, Budget Guide, Destination Guide, Travel Tips)
+
+CONTENT:
+(full blog in Markdown with H2/H3 headings, short paragraphs, and practical tips)
+
+TAGS: keyword1, keyword2, keyword3
+
+FAQS: (one per line)
+Q: question | A: answer
+Q: question | A: answer
+
+META TITLE: (under 60 characters)
+META DESCRIPTION: (under 155 characters)
 
 Keep the tone warm, trustworthy, and locally helpful. Avoid keyword stuffing and do not invent prices, hotel names, or unavailable activities.`
 
@@ -237,9 +246,22 @@ export function BlogForm({
       </div>
 
       <aside className="space-y-5">
+        <AiImport
+          mappings={[
+            { label: "TITLE", field: "title" },
+            { label: "SLUG", field: "slug" },
+            { label: "EXCERPT", field: "excerpt" },
+            { label: "CATEGORY", field: "category" },
+            { label: "CONTENT", field: "content" },
+            { label: "TAGS", field: "tags" },
+            { label: "FAQS", field: "faqs" },
+            { label: "META TITLE", field: "metaTitle" },
+            { label: "META DESCRIPTION", field: "metaDescription" },
+          ]}
+        />
         <PromptTemplatePanel
           title="AI Blog Starter"
-          description="Copy this prompt into your AI writer, fill the brackets, then paste the result into the matching fields."
+          description="Copy this prompt into your AI writer, fill the brackets, then paste the whole answer into the Auto-Fill box above."
           prompt={blogPromptTemplate}
         />
 
