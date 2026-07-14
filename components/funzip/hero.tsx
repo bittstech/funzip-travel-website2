@@ -30,12 +30,14 @@ export function Hero({
 }) {
   const sectionRef = useRef<HTMLElement>(null)
   const whatsapp = settings.whatsappNumber || "910000000000"
+  const whatsappMessage = encodeURIComponent(
+    "Hi Funzip! I'm planning a Kashmir trip — can you build me a custom itinerary with your best direct price?",
+  )
 
   useGSAP(
     () => {
       const mm = gsap.matchMedia()
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // Ken Burns settle on the background
         gsap.fromTo(
           ".hero-img",
           { scale: 1.12 },
@@ -51,11 +53,7 @@ export function Hero({
             "-=0.35",
           )
           .from(".hero-sub", { y: 24, opacity: 0, duration: 0.8 }, "-=0.5")
-          .from(
-            ".hero-cta",
-            { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 },
-            "-=0.45",
-          )
+          .from(".hero-ctas", { y: 20, opacity: 0, duration: 0.7 }, "-=0.45")
           .from(".hero-note", { opacity: 0, duration: 0.6 }, "-=0.2")
           .from(
             ".hero-trust-item",
@@ -63,7 +61,6 @@ export function Hero({
             "-=0.4",
           )
 
-        // Gentle parallax on scroll
         gsap.to(".hero-img", {
           yPercent: 12,
           ease: "none",
@@ -71,17 +68,6 @@ export function Hero({
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom top",
-            scrub: true,
-          },
-        })
-        gsap.to(".hero-copy", {
-          yPercent: 18,
-          opacity: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: "85% top",
             scrub: true,
           },
         })
@@ -94,7 +80,7 @@ export function Hero({
     <section
       ref={sectionRef}
       id="home"
-      className="relative isolate min-h-[100svh] overflow-hidden bg-black"
+      className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-black"
     >
       {/* Background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -108,13 +94,13 @@ export function Hero({
             className="object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/15" />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/85 to-transparent" />
       </div>
 
       {/* Content — one left axis, vertically centered */}
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-4 pb-44 pt-32 sm:px-6 sm:pb-40 lg:px-8">
-        <div className="hero-copy max-w-3xl">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-4 pb-16 pt-32 sm:px-6 lg:px-8">
+        <div className="max-w-3xl">
           <p className="hero-eyebrow flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-primary sm:text-sm">
             <span className="h-px w-10 bg-primary" aria-hidden />
             Funzip · Native Kashmiri Hosts
@@ -122,7 +108,10 @@ export function Hero({
 
           <h1 className="mt-6 font-heading text-5xl font-semibold leading-[1.04] text-white drop-shadow-lg sm:text-6xl md:text-7xl lg:text-8xl">
             {headlineLines.map((line) => (
-              <span key={line} className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
+              <span
+                key={line}
+                className="block overflow-hidden pb-[0.1em] -mb-[0.1em]"
+              >
                 <span className="hero-line block will-change-transform">
                   {line}
                 </span>
@@ -136,19 +125,20 @@ export function Hero({
             of a Kashmiri home.
           </p>
 
-          <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+          {/* Equal-width, equal-height CTA pair on a single grid row */}
+          <div className="hero-ctas mt-9 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
             <a
               href="#contact"
-              className="hero-cta group inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-105 sm:w-auto"
+              className="group inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/40 transition-transform hover:scale-[1.03]"
             >
               Get My Free Itinerary
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
             <a
-              href={`https://wa.me/${whatsapp}?text=${encodeURIComponent("Hi Funzip! I'm planning a Kashmir trip — can you help me build a custom itinerary?")}`}
+              href={`https://wa.me/${whatsapp}?text=${whatsappMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hero-cta inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/35 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20 sm:w-auto"
+              className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/35 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20"
             >
               <MessageCircle className="h-4 w-4" />
               Chat With a Local
@@ -161,8 +151,8 @@ export function Hero({
         </div>
       </div>
 
-      {/* Trust strip pinned to the bottom, same container axis */}
-      <div className="absolute inset-x-0 bottom-0 z-10 border-t border-white/15 bg-black/30 backdrop-blur-md">
+      {/* Trust strip — in flow, same container axis */}
+      <div className="relative z-10 border-t border-white/15 bg-black/30 backdrop-blur-md">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-4 px-4 py-5 sm:px-6 lg:grid-cols-4 lg:gap-x-10 lg:px-8">
           {trustItems.map((item) => (
             <div
